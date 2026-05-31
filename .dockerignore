@@ -1,0 +1,13 @@
+.venv/
+.venv311/
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+*.db
+hf-whisper-api/
+*.mp3
+*.m4a
+*.mp4
+node_modules/
