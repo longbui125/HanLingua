@@ -23,6 +23,12 @@ function escapeHtml(value = '') {
     }[char]));
 }
 
+function resolveAssetUrl(url = '') {
+    if (!url || url.startsWith('http') || url.startsWith('data:')) return url;
+    const base = (window.HANLINGUA_API_URL || '').replace(/\/$/, '');
+    return base ? `${base}${url.startsWith('/') ? url : `/${url}`}` : url;
+}
+
 function formatSuggestionMessage(error) {
     if (!error?.suggestions?.length) return error.message;
     return `${error.message} Gợi ý: ${error.suggestions.join(', ')}`;

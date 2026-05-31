@@ -23,8 +23,17 @@ try:
 except ImportError:
     HAS_YTDLP = False
 
-# CORS: allow frontend origin from env, defaults to allow all
-CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
+# CORS: allow frontend origin from env, defaults to allow all.
+def parse_cors_origins():
+    origins = [
+        origin.strip().rstrip("/")
+        for origin in os.environ.get("CORS_ORIGINS", "*").split(",")
+        if origin.strip()
+    ]
+    return origins or ["*"]
+
+
+CORS_ORIGINS = parse_cors_origins()
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
@@ -541,10 +550,15 @@ async def process_youtube(data: dict, current_user: models.User = Depends(auth.g
 @app.post("/api/admin/upload-audio")
 async def upload_audio(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):
     require_operator(current_user)
-    file_path = os.path.join(DATA_DIR, file.filename)
+    filename = os.path.basename(file.filename or f"audio_{int(datetime.datetime.utcnow().timestamp())}")
+    content = await file.read()
+    if is_supabase_storage_enabled():
+        audio_url = upload_public_file(f"lesson_audio/{filename}", content, file.content_type or "application/octet-stream")
+        return {"url": audio_url}
+    file_path = os.path.join(DATA_DIR, filename)
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {"url": f"/data/{file.filename}"}
+        buffer.write(content)
+    return {"url": f"/data/{filename}"}
 
 @app.post("/api/admin/lessons")
 def create_lesson(req: LessonCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
@@ -584,7 +598,12 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
             os.remove(audio_path)
         raise HTTPException(status_code=400, detail=f"Không thể tạo bài học từ link này. Hãy cập nhật yt-dlp hoặc thử link công khai khác. Chi tiết: {exc}")
 
-    audio_url = f"/data/{filename_base}.m4a"
+    if is_supabase_storage_enabled():
+        with open(audio_path, "rb") as f:
+            audio_url = upload_public_file(f"lesson_audio/{filename_base}.m4a", f.read(), "audio/mp4")
+        os.remove(audio_path)
+    else:
+        audio_url = f"/data/{filename_base}.m4a"
     lesson = models.Lesson(
         title=req.title.strip(),
         level=req.level,

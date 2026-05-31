@@ -1103,7 +1103,7 @@ async function loadDefaultData(id) {
             title: data.title,
             transcript: data.transcript, 
             translation: data.translation,
-            audioSrc: data.audio_src, 
+            audioSrc: resolveAssetUrl(data.audio_src), 
             clozeData: data.cloze_data 
         };
 
@@ -1111,7 +1111,7 @@ async function loadDefaultData(id) {
         document.getElementById('translation-box').classList.add('hidden');
         
         // Load Audio
-        document.getElementById('audio-container').innerHTML = `<audio controls style="width: 100%;"><source src="${data.audio_src}" type="audio/mp3"></audio>`;
+        document.getElementById('audio-container').innerHTML = `<audio controls style="width: 100%;"><source src="${tabState.lessonData.audioSrc}" type="audio/mp3"></audio>`;
         
         // Load Transcript
         if (data.translation) {

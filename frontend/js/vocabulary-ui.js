@@ -22,7 +22,8 @@ const VocabularyUI = {
 
     card(item, isAdmin = false) {
         const example = item.example ? `<div class="mt-3 text-xs text-gray-500 bg-white/70 border border-gray-100 rounded-xl p-3">${escapeHtml(item.example)}</div>` : '<div class="mt-3 text-xs text-gray-400 bg-white/70 border border-gray-100 rounded-xl p-3">Chưa có ví dụ.</div>';
-        const imageSrc = item.image_url ? `${item.image_url}?v=${Date.now()}` : '';
+        const resolvedImageUrl = resolveAssetUrl(item.image_url);
+        const imageSrc = resolvedImageUrl ? `${resolvedImageUrl}?v=${Date.now()}` : '';
         const imageBlock = isAdmin
             ? `<label onclick="event.stopPropagation()" class="relative h-32 rounded-2xl overflow-hidden border border-dashed border-purple-100 bg-purple-50/50 text-purple-300 flex items-center justify-center cursor-pointer group">
                     ${imageSrc ? `<img src="${imageSrc}" alt="${escapeHtml(item.korean)}" class="absolute inset-0 w-full h-full object-cover">` : '<i class="fa-solid fa-image text-2xl"></i>'}
@@ -186,4 +187,3 @@ const VocabularyUI = {
         }
     }
 };
-

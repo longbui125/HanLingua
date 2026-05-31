@@ -8,7 +8,8 @@ function showAccountSettingsMessage(message, type = 'success') {
 }
 
 function getAvatarSrc(url) {
-    return url ? `${url}${url.includes('?') ? '&' : '?'}v=${avatarCacheKey}` : '';
+    const src = resolveAssetUrl(url);
+    return src ? `${src}${src.includes('?') ? '&' : '?'}v=${avatarCacheKey}` : '';
 }
 
 function openProfileAvatarViewer() {
@@ -246,4 +247,3 @@ async function updateAccountPassword(event) {
         showAccountSettingsMessage(e.message, 'error');
     }
 }
-
