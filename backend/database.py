@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker
 
 import models
@@ -52,21 +52,37 @@ def get_db():
         db.close()
 
 
+def _existing_columns(conn, table_name):
+    if conn.dialect.name == "sqlite":
+        return {row[1] for row in conn.execute(text(f"PRAGMA table_info({table_name})"))}
+    return {column["name"] for column in inspect(conn).get_columns(table_name)}
+
+
+def _add_missing_column(conn, table_name, existing_columns, column_name, sqlite_definition, postgres_definition=None):
+    if column_name in existing_columns:
+        return
+    definition = sqlite_definition if conn.dialect.name == "sqlite" else (postgres_definition or sqlite_definition)
+    conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {definition}"))
+    existing_columns.add(column_name)
+
+
 def ensure_database_schema():
     models.Base.metadata.create_all(bind=engine)
-    if engine.dialect.name != "sqlite":
-        return
     with engine.begin() as conn:
-        user_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
-        if "avatar_url" not in user_columns:
-            conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
-        progress_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(user_progress)"))}
-        if "feedback_json" not in progress_columns:
-            conn.execute(text("ALTER TABLE user_progress ADD COLUMN feedback_json TEXT"))
-        if "mistake_tags" not in progress_columns:
-            conn.execute(text("ALTER TABLE user_progress ADD COLUMN mistake_tags TEXT"))
-        if "content_type" not in progress_columns:
-            conn.execute(text("ALTER TABLE user_progress ADD COLUMN content_type VARCHAR DEFAULT 'dictation'"))
-        vocabulary_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(vocabulary)"))}
-        if "image_url" not in vocabulary_columns:
-            conn.execute(text("ALTER TABLE vocabulary ADD COLUMN image_url VARCHAR"))
+        user_columns = _existing_columns(conn, "users")
+        _add_missing_column(conn, "users", user_columns, "created_at", "created_at DATETIME", "created_at TIMESTAMP")
+        _add_missing_column(conn, "users", user_columns, "approved_at", "approved_at DATETIME", "approved_at TIMESTAMP")
+        _add_missing_column(conn, "users", user_columns, "account_status", "account_status VARCHAR DEFAULT 'approved'")
+        _add_missing_column(conn, "users", user_columns, "avatar_url", "avatar_url VARCHAR")
+        _add_missing_column(conn, "users", user_columns, "trial_expires_at", "trial_expires_at DATETIME", "trial_expires_at TIMESTAMP")
+
+        lesson_columns = _existing_columns(conn, "lessons")
+        _add_missing_column(conn, "lessons", lesson_columns, "category", "category VARCHAR DEFAULT 'beginner'")
+
+        progress_columns = _existing_columns(conn, "user_progress")
+        _add_missing_column(conn, "user_progress", progress_columns, "feedback_json", "feedback_json TEXT")
+        _add_missing_column(conn, "user_progress", progress_columns, "mistake_tags", "mistake_tags TEXT")
+        _add_missing_column(conn, "user_progress", progress_columns, "content_type", "content_type VARCHAR DEFAULT 'dictation'")
+
+        vocabulary_columns = _existing_columns(conn, "vocabulary")
+        _add_missing_column(conn, "vocabulary", vocabulary_columns, "image_url", "image_url VARCHAR")

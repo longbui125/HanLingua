@@ -1,45 +1,11 @@
 import datetime
 import json, os, re
-from sqlalchemy import text
-from sqlalchemy.orm import sessionmaker
 import models, auth
-from database import DATA_DIR, engine, ensure_database_schema
+from database import DATA_DIR, SessionLocal, ensure_database_schema
 from vocabulary_loader import iter_forecast_vocabulary
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-models.Base.metadata.create_all(bind=engine)
 ensure_database_schema()
-
-if engine.dialect.name == "sqlite":
-  with engine.begin() as conn:
-    user_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
-    if "created_at" not in user_columns:
-        conn.execute(text("ALTER TABLE users ADD COLUMN created_at DATETIME"))
-    if "approved_at" not in user_columns:
-        conn.execute(text("ALTER TABLE users ADD COLUMN approved_at DATETIME"))
-    if "account_status" not in user_columns:
-        conn.execute(text("ALTER TABLE users ADD COLUMN account_status VARCHAR DEFAULT 'approved'"))
-    if "avatar_url" not in user_columns:
-        conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
-    if "trial_expires_at" not in user_columns:
-        conn.execute(text("ALTER TABLE users ADD COLUMN trial_expires_at DATETIME"))
-    lesson_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(lessons)"))}
-    if "category" not in lesson_columns:
-        conn.execute(text("ALTER TABLE lessons ADD COLUMN category VARCHAR DEFAULT 'beginner'"))
-    progress_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(user_progress)"))}
-    if "feedback_json" not in progress_columns:
-        conn.execute(text("ALTER TABLE user_progress ADD COLUMN feedback_json TEXT"))
-    if "mistake_tags" not in progress_columns:
-        conn.execute(text("ALTER TABLE user_progress ADD COLUMN mistake_tags TEXT"))
-    if "content_type" not in progress_columns:
-        conn.execute(text("ALTER TABLE user_progress ADD COLUMN content_type VARCHAR DEFAULT 'dictation'"))
-    models.Payment.__table__.create(bind=conn, checkfirst=True)
-    models.Vocabulary.__table__.create(bind=conn, checkfirst=True)
-    vocabulary_columns = {row[1] for row in conn.execute(text("PRAGMA table_info(vocabulary)"))}
-    if "image_url" not in vocabulary_columns:
-        conn.execute(text("ALTER TABLE vocabulary ADD COLUMN image_url VARCHAR"))
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 
 print("--- ĐANG KHỞI TẠO HỆ THỐNG HANLINGUA ---")
