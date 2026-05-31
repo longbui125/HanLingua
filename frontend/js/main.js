@@ -1132,10 +1132,18 @@ function renderInputArea(level, clozeData) {
     const isAI = !document.getElementById('panel-ai-control').classList.contains('hidden');
 
     if (isAI || Number(level) === 2 || !clozeData || clozeData.length === 0) {
+        const aiTranscriptPanel = isAI && tabState.aiData.transcript ? `
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 min-h-[180px]">
+                <div class="text-sm font-black text-amber-800 mb-2">Transcript AI</div>
+                <div class="mt-3 text-gray-900 leading-relaxed whitespace-pre-wrap">${escapeHtml(tabState.aiData.transcript)}</div>
+            </div>` : '';
         container.innerHTML = `
+            <div class="${isAI && tabState.aiData.transcript ? 'grid md:grid-cols-2 gap-4' : ''}">
+            ${aiTranscriptPanel}
             <textarea id="user-input-text" rows="6" 
                 class="w-full p-4 border rounded-xl shadow-inner outline-none focus:border-hanred-500" 
-                placeholder="Nghe và gõ lại nội dung bài học..."></textarea>`;
+                placeholder="Nghe và gõ lại nội dung bài học..."></textarea>
+            </div>`;
     } else {
 
         let html = '<div class="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-xl">';
@@ -1169,7 +1177,8 @@ async function submitEval() {
             const userText = inputEl.value.trim();
             if (!userText) return alert("Vui lòng nhập bài làm!");
 
-            const target = isAI ? tabState.aiData.transcript : tabState.lessonData.transcript;
+            const target = isAI ? (tabState.aiData.transcript || '') : tabState.lessonData.transcript;
+            if (isAI && !target) return alert("Chưa có transcript AI để chấm điểm. Hãy phân tích file trước.");
             const res = await API.evaluateFull(target, userText, isAI ? null : tabState.currentLessonId);
             recordLearningActivity({
                 title: isAI ? 'AI Dictation tự tạo' : (tabState.lessonData.title || 'Bài Dictation'),
@@ -1178,7 +1187,7 @@ async function submitEval() {
                 lesson_id: isAI ? null : tabState.currentLessonId
             });
             markDailyTaskDone('dictation', { refresh: false });
-            renderFeedback(res); 
+            renderFeedback(res, { targetText: target, userText, isAI }); 
         } else {
             const inputs = document.querySelectorAll('.cloze-input');
             const answers = Array.from(inputs).map(i => i.value.trim());
@@ -1197,10 +1206,21 @@ async function submitEval() {
     }
 }
 
-function renderFeedback(res) {
+function renderFeedback(res, context = {}) {
     const container = document.getElementById('feedback-container');
     const rows = [];
     const feedback = res.feedback || [];
+    const comparison = context.isAI ? `
+        <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div class="text-xs font-black text-amber-800 uppercase mb-2">Transcript AI</div>
+                <div class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">${escapeHtml(context.targetText || '')}</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <div class="text-xs font-black text-gray-600 uppercase mb-2">Bài làm của bạn</div>
+                <div class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">${escapeHtml(context.userText || '')}</div>
+            </div>
+        </div>` : '';
     for (let i = 0; i < feedback.length; i++) {
         const item = feedback[i];
         if (item.status === 'correct') {
@@ -1228,29 +1248,32 @@ function renderFeedback(res) {
                 <h4 class="text-xl font-bold">Kết quả nghe chép</h4>
                 <span class="text-4xl font-black text-hanred-500">${res.score_percent}%</span>
             </div>
+            ${comparison}
             <div class="flex flex-wrap gap-3 leading-loose text-lg">
                 ${rows.map(row => {
+                    const safeUser = escapeHtml(row.user);
+                    const safeCorrect = escapeHtml(row.correct);
                     if (row.status === 'correct') {
                         return `<span class="inline-flex items-center gap-1 bg-green-50 border border-green-100 text-green-700 font-bold px-2 py-1 rounded-lg">
-                            <i class="fa-solid fa-check"></i> ${row.user}
+                            <i class="fa-solid fa-check"></i> ${safeUser}
                         </span>`;
                     }
                     if (row.status === 'wrong') {
                         return `<span class="inline-flex items-center gap-2 bg-red-50 border border-red-100 px-2 py-1 rounded-lg">
-                            <span class="text-red-600 font-bold"><i class="fa-solid fa-xmark"></i> <span class="line-through">${row.user}</span></span>
+                            <span class="text-red-600 font-bold"><i class="fa-solid fa-xmark"></i> <span class="line-through">${safeUser}</span></span>
                             <span class="text-gray-400">→</span>
-                            <span class="text-green-700 font-bold"><i class="fa-solid fa-check"></i> ${row.correct}</span>
+                            <span class="text-green-700 font-bold"><i class="fa-solid fa-check"></i> ${safeCorrect}</span>
                         </span>`;
                     }
                     if (row.status === 'extra') {
                         return `<span class="inline-flex items-center gap-1 bg-orange-50 border border-orange-100 text-orange-700 font-bold px-2 py-1 rounded-lg">
-                            <i class="fa-solid fa-xmark"></i> <span class="line-through">${row.user}</span> <span class="text-xs font-medium">(thừa)</span>
+                            <i class="fa-solid fa-xmark"></i> <span class="line-through">${safeUser}</span> <span class="text-xs font-medium">(thừa)</span>
                         </span>`;
                     }
                     return `<span class="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
                         <span class="text-gray-500 font-bold"><i class="fa-solid fa-minus"></i> ___</span>
                         <span class="text-gray-400">→</span>
-                        <span class="text-green-700 font-bold"><i class="fa-solid fa-check"></i> ${row.correct}</span>
+                        <span class="text-green-700 font-bold"><i class="fa-solid fa-check"></i> ${safeCorrect}</span>
                     </span>`;
                 }).join('')}
             </div>
