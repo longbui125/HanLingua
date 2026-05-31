@@ -8,6 +8,7 @@ torch/transformers are installed.
 
 import os
 import re
+from pathlib import Path
 
 WHISPER_API_URL = os.environ.get("WHISPER_API_URL", "").rstrip("/")
 WHISPER_API_KEY = os.environ.get("WHISPER_API_KEY", "")
@@ -26,13 +27,24 @@ def _transcribe_remote(file_path: str) -> list[str]:
         response = requests.post(
             url,
             params=params,
-            files={"file": (os.path.basename(file_path), f)},
+            files={"file": (Path(file_path).name or "audio.mp3", f)},
             timeout=300,  # Whisper can take a while on long audio
         )
 
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as exc:
+        try:
+            detail = response.json().get("detail")
+        except Exception:
+            detail = response.text[:500]
+        raise RuntimeError(f"Whisper API error ({response.status_code}): {detail}") from exc
+
     data = response.json()
-    return data.get("transcript", [])
+    transcript = data.get("transcript") or []
+    if isinstance(transcript, str):
+        transcript = [transcript]
+    return [item.strip() for item in transcript if item and item.strip()]
 
 
 def _transcribe_local(file_path: str) -> list[str]:

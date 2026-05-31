@@ -524,12 +524,24 @@ def evaluate_cloze(req: ClozeEvalRequest, db: Session = Depends(get_db), current
 @app.post("/api/process-ai")
 async def process_ai(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):
     require_active_trial(current_user)
-    temp_path = f"temp_{file.filename}"
-    with open(temp_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
-    transcript = generate_transcript_json(temp_path)
-    with open(temp_path, "rb") as f: audio_b64 = base64.b64encode(f.read()).decode()
-    os.remove(temp_path)
-    return {"transcript": " ".join(transcript), "audio_b64": audio_b64}
+    ext = os.path.splitext(file.filename or "")[1].lower() or ".mp3"
+    temp_path = f"temp_ai_{int(datetime.datetime.utcnow().timestamp())}{ext}"
+    try:
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        transcript = generate_transcript_json(temp_path)
+        if not transcript:
+            raise HTTPException(status_code=502, detail="Whisper không trả về transcript. Hãy thử file audio rõ hơn hoặc ngắn hơn.")
+        with open(temp_path, "rb") as f:
+            audio_b64 = base64.b64encode(f.read()).decode()
+        return {"transcript": " ".join(transcript), "audio_b64": audio_b64}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Lỗi phân tích audio bằng Whisper: {exc}")
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
 @app.post("/api/process-youtube")
 async def process_youtube(data: dict, current_user: models.User = Depends(auth.get_current_user)):

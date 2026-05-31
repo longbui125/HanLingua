@@ -2,12 +2,22 @@ import difflib
 import re
 
 def evaluate_dictation(original_text, user_input):
+    def contains_korean(text):
+        return bool(re.search(r'[가-힣]', text or ''))
+
     def clean_word(word):
         word = word.lower() 
         return re.sub(r'[.,!?~"\'\(\)\[\]\{\}\-\s]+', '', word).strip()
 
-    orig_words = [w for w in original_text.split() if w.strip()]
-    user_words = [w for w in user_input.split() if w.strip()]
+    def tokenize(text):
+        words = [w for w in text.split() if w.strip()]
+        if contains_korean(text) and len(words) <= 1:
+            compact = clean_word(text)
+            return list(compact)
+        return words
+
+    orig_words = tokenize(original_text)
+    user_words = tokenize(user_input)
     
     orig_clean = [clean_word(w) for w in orig_words]
     user_clean = [clean_word(w) for w in user_words]
