@@ -73,10 +73,10 @@ const AdminUI = {
                         </select>
                         <button onclick="AdminUI.updateStatus(${u.id})" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold cursor-pointer hover:bg-gray-200 transition" ${u.role === 'admin' ? 'disabled' : ''}>Cập nhật</button>
                         <select id="access-plan-${u.id}" class="p-2 border rounded-lg text-sm outline-none" ${u.role === 'admin' ? 'disabled' : ''}>
-                            <option value="Gói 1 tháng">Gói 1 tháng</option>
-                            <option value="Gói 3 tháng">Gói 3 tháng</option>
-                            <option value="Gói 6 tháng">Gói 6 tháng</option>
-                            <option value="Gói 12 tháng">Gói 12 tháng</option>
+                            <option value="Premium Monthly">Premium Monthly</option>
+                            <option value="Premium Quarterly">Premium Quarterly</option>
+                            <option value="Premium Yearly">Premium Yearly</option>
+                            <option value="HanLingua Pro AI">HanLingua Pro AI</option>
                         </select>
                         <button onclick="AdminUI.grantAccess(${u.id})" class="bg-hanred-600 text-white px-4 py-2 rounded-lg text-sm font-bold cursor-pointer hover:bg-hanred-700 transition" ${u.role === 'admin' ? 'disabled' : ''}>Cấp quyền học</button>
                     </div>`;
@@ -363,4 +363,3 @@ const AdminUI = {
         }
     }
 };
-

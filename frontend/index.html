@@ -409,78 +409,124 @@
             </div>
         </section>
 
-        <section id="pricing" class="py-20 bg-gray-50 border-t border-gray-100">
+        <section id="pricing" class="py-16 bg-gray-50 border-t border-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
+                <div class="text-center mb-10">
                     <h2 class="text-3xl font-extrabold text-gray-900">Bảng giá HanLingua</h2>
-                    <p class="mt-4 text-gray-600">Dùng thử 5 ngày. Đăng nhập để thanh toán.</p>
+                    <p class="mt-3 text-gray-600">Chọn gói học phù hợp và thanh toán bằng QR.</p>
                 </div>
 
-                <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-                    <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-xl transition flex flex-col h-full">
-                        <div class="text-sm font-bold text-hanred-600 uppercase mb-3">Khởi động</div>
-                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">1 tháng</h3>
-                        <div class="mb-6">
-                            <span class="text-4xl font-black text-gray-900">120.000</span>
-                            <span class="text-gray-500 font-medium">VNĐ / tháng</span>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-stretch">
+                    <div class="bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="bg-red-700 text-white text-center text-sm font-black uppercase py-3">Free Plan</div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="text-center mb-5">
+                                <div class="text-4xl font-black text-red-700">0đ</div>
+                                <div class="text-xs text-gray-500 font-bold">Miễn phí</div>
+                                <div class="w-16 h-16 mx-auto mt-5 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-3xl">
+                                    <i class="fa-solid fa-gift"></i>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-xs text-gray-700 flex-1">
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>10 bài nghe đầu tiên</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>50 Flashcard</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>3 lần AI sửa phát âm/ngày</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Podcast & hội thoại cơ bản</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Theo dõi tiến độ cơ bản</li>
+                            </ul>
+                            <button onclick="AuthUI.openModal(false)" class="mt-6 w-full border border-red-600 text-red-600 hover:bg-red-50 font-bold py-2.5 rounded-lg transition cursor-pointer">Trải nghiệm ngay</button>
                         </div>
-                        <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> 30 ngày học đầy đủ</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> AI Dictation và bài hệ thống</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> AI Speaking</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Forecast Vocabulary theo chủ đề</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Lưu điểm và tiến độ tháng</li>
-                        </ul>
-                        <button onclick="openPaymentModal('Gói 1 tháng', 120000)" class="w-full bg-white border border-hanred-600 text-hanred-600 hover:bg-red-50 font-bold py-3 rounded-xl transition cursor-pointer">Thanh toán</button>
                     </div>
 
-                    <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-xl transition flex flex-col h-full">
-                        <div class="text-sm font-bold text-hanred-600 uppercase mb-3">Tăng tốc</div>
-                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">3 tháng</h3>
-                        <div class="mb-6">
-                            <span class="text-4xl font-black text-gray-900">330.000</span>
-                            <span class="text-gray-500 font-medium">VNĐ / 3 tháng</span>
+                    <div class="bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="bg-red-700 text-white text-center text-sm font-black uppercase py-3">Premium Monthly</div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="text-center mb-5">
+                                <div class="text-4xl font-black text-red-700">69.000đ</div>
+                                <div class="text-xs text-gray-500 font-bold">/tháng</div>
+                                <div class="w-16 h-16 mx-auto mt-5 rounded-full bg-red-700 text-white flex items-center justify-center text-3xl">
+                                    <i class="fa-solid fa-crown"></i>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-xs text-gray-700 flex-1">
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Không giới hạn bài nghe</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Không giới hạn Flashcard</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Podcast tiếng Hàn</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Bài học phim & Kpop</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Theo dõi tiến độ chi tiết</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Lưu từ vựng & ghi chú</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Học trên mọi thiết bị</li>
+                            </ul>
+                            <button onclick="openPaymentModal('Premium Monthly', 69000)" class="mt-6 w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer">Đăng ký ngay</button>
                         </div>
-                        <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> 90 ngày học đầy đủ</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> AI Dictation, AI Speaking và Forecast Vocabulary</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Phù hợp xây thói quen mỗi ngày</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Theo dõi tiến độ theo tháng</li>
-                        </ul>
-                        <button onclick="openPaymentModal('Gói 3 tháng', 330000)" class="w-full bg-white border border-hanred-600 text-hanred-600 hover:bg-red-50 font-bold py-3 rounded-xl transition cursor-pointer">Thanh toán</button>
                     </div>
 
-                    <div class="relative bg-white rounded-2xl border-2 border-hanred-600 p-8 shadow-xl scale-[1.02] flex flex-col h-full">
-                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-hanred-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Phổ biến nhất</div>
-                        <div class="text-sm font-bold text-hanred-600 uppercase mb-3">Luyện thi</div>
-                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">6 tháng</h3>
-                        <div class="mb-6">
-                            <span class="text-4xl font-black text-gray-900">600.000</span>
-                            <span class="text-gray-500 font-medium">VNĐ / 6 tháng</span>
+                    <div class="relative bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="absolute -right-8 top-4 rotate-45 bg-yellow-300 text-red-800 text-[10px] font-black px-8 py-1 shadow">Best Value</div>
+                        <div class="bg-red-700 text-white text-center text-sm font-black uppercase py-3">Premium Quarterly</div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="text-center mb-5">
+                                <div class="text-4xl font-black text-red-700">179.000đ</div>
+                                <div class="text-xs text-gray-500 font-bold">/3 tháng</div>
+                                <div class="text-[11px] text-gray-500">(~59.667đ/tháng)</div>
+                                <div class="w-16 h-16 mx-auto mt-4 rounded-full bg-red-700 text-white flex items-center justify-center text-3xl">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-xs text-gray-700 flex-1">
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Tất cả quyền lợi Premium</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Flashcard theo chủ đề</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Bài tập luyện nghe nâng cao</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Ưu tiên hỗ trợ khách hàng</li>
+                            </ul>
+                            <button onclick="openPaymentModal('Premium Quarterly', 179000)" class="mt-6 w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer">Đăng ký ngay</button>
                         </div>
-                        <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> 180 ngày học đầy đủ</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Kho Forecast TOPIK và thẻ từ tự thêm</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Phù hợp duy trì lộ trình học đều đặn</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Duy trì lịch sử điểm dài hạn</li>
-                        </ul>
-                        <button onclick="openPaymentModal('Gói 6 tháng', 600000)" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white font-bold py-3 rounded-xl transition shadow-lg cursor-pointer">Thanh toán</button>
                     </div>
 
-                    <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-xl transition flex flex-col h-full">
-                        <div class="text-sm font-bold text-hanred-600 uppercase mb-3">Đồng hành</div>
-                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">12 tháng</h3>
-                        <div class="mb-6">
-                            <span class="text-4xl font-black text-gray-900">1.000.000</span>
-                            <span class="text-gray-500 font-medium">VNĐ / năm</span>
+                    <div class="relative bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="absolute -right-8 top-4 rotate-45 bg-yellow-300 text-red-800 text-[10px] font-black px-8 py-1 shadow">Best Value</div>
+                        <div class="bg-red-700 text-white text-center text-sm font-black uppercase py-3">Premium Yearly</div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="text-center mb-5">
+                                <div class="text-4xl font-black text-red-700">599.000đ</div>
+                                <div class="text-xs text-gray-500 font-bold">/năm</div>
+                                <div class="text-[11px] text-gray-500">(~49.917đ/tháng)</div>
+                                <div class="w-16 h-16 mx-auto mt-4 rounded-full bg-red-700 text-white flex items-center justify-center text-3xl">
+                                    <i class="fa-solid fa-shield-heart"></i>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-xs text-gray-700 flex-1">
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Tất cả quyền lợi Premium</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Flashcard không giới hạn</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Kho tài liệu độc quyền</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Học offline (tải bài học)</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Ưu tiên hỗ trợ 24/7</li>
+                            </ul>
+                            <button onclick="openPaymentModal('Premium Yearly', 599000)" class="mt-6 w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer">Đăng ký ngay</button>
                         </div>
-                        <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> 365 ngày học đầy đủ</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Trọn bộ Dictation, Speaking và Forecast Vocabulary</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Chi phí tốt nhất cho học dài hạn</li>
-                            <li><i class="fa-solid fa-check text-hanred-500 mr-2"></i> Theo dõi tiến bộ xuyên suốt năm</li>
-                        </ul>
-                        <button onclick="openPaymentModal('Gói 12 tháng', 1000000)" class="w-full bg-white border border-hanred-600 text-hanred-600 hover:bg-red-50 font-bold py-3 rounded-xl transition cursor-pointer">Thanh toán</button>
+                    </div>
+
+                    <div class="relative bg-white rounded-lg border-2 border-red-700 shadow-md overflow-hidden flex flex-col">
+                        <div class="absolute right-2 top-2 bg-gray-900 text-white text-[9px] font-black px-2 py-1 rounded">BEST<br>VALUE</div>
+                        <div class="bg-red-700 text-white text-center text-sm font-black uppercase py-3 leading-tight">HanLingua<br>Pro AI</div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="text-center mb-5">
+                                <div class="text-4xl font-black text-red-700">99.000đ</div>
+                                <div class="text-xs text-gray-500 font-bold">/tháng</div>
+                                <div class="w-16 h-16 mx-auto mt-5 rounded-full bg-red-700 text-white flex items-center justify-center text-2xl font-black">
+                                    AI
+                                </div>
+                            </div>
+                            <div class="text-[11px] font-bold text-gray-700 mb-2">Bao gồm tất cả quyền lợi Premium và thêm:</div>
+                            <ul class="space-y-2 text-xs text-gray-700 flex-1">
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>AI chấm phát âm không giới hạn</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>AI phân tích lỗi nghe</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>AI tạo Flashcard từ bài học</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>AI tạo bài nghe cá nhân hóa</li>
+                                <li><i class="fa-solid fa-check text-red-600 mr-2"></i>Lộ trình học cá nhân hóa 100%</li>
+                            </ul>
+                            <button onclick="openPaymentModal('HanLingua Pro AI', 99000)" class="mt-6 w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer">Đăng ký ngay</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -881,7 +927,7 @@
                         <h3 class="font-black text-2xl text-gray-900 mt-1">Thêm từ vựng</h3>
                         <div class="space-y-3 mt-5">
                             <input id="admin-vocab-korean" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Từ tiếng Hàn">
-                            <input id="admin-vocab-hanviet" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Âm Hán Việt">
+                            <input id="admin-vocab-hanviet" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="">
                             <input id="admin-vocab-meaning" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Nghĩa tiếng Việt">
                             <input id="admin-vocab-topic" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Chủ đề">
                             <textarea id="admin-vocab-example" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Ví dụ ngữ cảnh"></textarea>
@@ -1126,7 +1172,7 @@
                                 <h4 class="font-black text-gray-900 text-xl mt-1">Ghi nhớ theo chủ đề riêng</h4>
                                 <div class="space-y-3 mt-5">
                                     <input id="user-vocab-korean" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Từ tiếng Hàn">
-                                    <input id="user-vocab-hanviet" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Âm Hán Việt">
+                                    <input id="user-vocab-hanviet" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="">
                                     <input id="user-vocab-meaning" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Nghĩa tiếng Việt">
                                     <input id="user-vocab-topic" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Chủ đề">
                                     <textarea id="user-vocab-example" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none" placeholder="Ví dụ hoặc ghi chú"></textarea>
@@ -1176,26 +1222,31 @@
                             </div>
                             <span class="bg-gray-100 text-gray-700 px-5 py-3 rounded-xl text-sm font-bold">Chọn gói bên dưới</span>
                         </div>
-                        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4 mt-6">
-                            <button onclick="openPaymentModal('Gói 1 tháng', 120000)" class="text-left bg-red-50 border border-red-100 rounded-2xl p-4 hover:bg-red-100 transition cursor-pointer">
-                                <div class="text-xs font-bold text-hanred-600 uppercase">Khởi động</div>
-                                <div class="font-black text-gray-900 mt-1">1 tháng</div>
-                                <div class="text-sm text-gray-500 mt-1">120.000 VNĐ</div>
+                        <div class="grid sm:grid-cols-2 xl:grid-cols-5 gap-4 mt-6">
+                            <button onclick="AuthUI.openModal(false)" class="text-left bg-white border border-red-100 rounded-lg p-4 hover:bg-red-50 transition cursor-pointer">
+                                <div class="text-xs font-bold text-red-600 uppercase">Free Plan</div>
+                                <div class="font-black text-gray-900 mt-1">0đ</div>
+                                <div class="text-sm text-gray-500 mt-1">Miễn phí</div>
                             </button>
-                            <button onclick="openPaymentModal('Gói 3 tháng', 330000)" class="text-left bg-orange-50 border border-orange-100 rounded-2xl p-4 hover:bg-orange-100 transition cursor-pointer">
-                                <div class="text-xs font-bold text-orange-600 uppercase">Tăng tốc</div>
-                                <div class="font-black text-gray-900 mt-1">3 tháng</div>
-                                <div class="text-sm text-gray-500 mt-1">330.000 VNĐ</div>
+                            <button onclick="openPaymentModal('Premium Monthly', 69000)" class="text-left bg-red-50 border border-red-100 rounded-lg p-4 hover:bg-red-100 transition cursor-pointer">
+                                <div class="text-xs font-bold text-red-600 uppercase">Premium Monthly</div>
+                                <div class="font-black text-gray-900 mt-1">69.000đ</div>
+                                <div class="text-sm text-gray-500 mt-1">/tháng</div>
                             </button>
-                            <button onclick="openPaymentModal('Gói 6 tháng', 600000)" class="text-left bg-blue-50 border border-blue-100 rounded-2xl p-4 hover:bg-blue-100 transition cursor-pointer">
-                                <div class="text-xs font-bold text-blue-600 uppercase">Luyện thi</div>
-                                <div class="font-black text-gray-900 mt-1">6 tháng</div>
-                                <div class="text-sm text-gray-500 mt-1">600.000 VNĐ</div>
+                            <button onclick="openPaymentModal('Premium Quarterly', 179000)" class="text-left bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:bg-yellow-100 transition cursor-pointer">
+                                <div class="text-xs font-bold text-yellow-700 uppercase">Premium Quarterly</div>
+                                <div class="font-black text-gray-900 mt-1">179.000đ</div>
+                                <div class="text-sm text-gray-500 mt-1">/3 tháng</div>
                             </button>
-                            <button onclick="openPaymentModal('Gói 12 tháng', 1000000)" class="text-left bg-green-50 border border-green-100 rounded-2xl p-4 hover:bg-green-100 transition cursor-pointer">
-                                <div class="text-xs font-bold text-green-600 uppercase">Đồng hành</div>
-                                <div class="font-black text-gray-900 mt-1">12 tháng</div>
-                                <div class="text-sm text-gray-500 mt-1">1.000.000 VNĐ</div>
+                            <button onclick="openPaymentModal('Premium Yearly', 599000)" class="text-left bg-green-50 border border-green-100 rounded-lg p-4 hover:bg-green-100 transition cursor-pointer">
+                                <div class="text-xs font-bold text-green-700 uppercase">Premium Yearly</div>
+                                <div class="font-black text-gray-900 mt-1">599.000đ</div>
+                                <div class="text-sm text-gray-500 mt-1">/năm</div>
+                            </button>
+                            <button onclick="openPaymentModal('HanLingua Pro AI', 99000)" class="text-left bg-gray-900 border border-gray-900 rounded-lg p-4 hover:bg-black transition cursor-pointer">
+                                <div class="text-xs font-bold text-red-200 uppercase">HanLingua Pro AI</div>
+                                <div class="font-black text-white mt-1">99.000đ</div>
+                                <div class="text-sm text-gray-300 mt-1">/tháng</div>
                             </button>
                         </div>
                     </section>
@@ -1300,12 +1351,12 @@
         window.HANLINGUA_API_URL = 'https://hanlingua-production.up.railway.app';
     </script>
 
-    <script src="js/api.js?v=20260601-01"></script>
-    <script src="js/utils.js?v=20260601-01"></script>
-    <script src="js/account-ui.js?v=20260601-01"></script>
-    <script src="js/admin-ui.js?v=20260601-01"></script>
-    <script src="js/vocabulary-ui.js?v=20260601-01"></script>
-    <script src="js/main.js?v=20260601-01"></script>
+    <script src="js/api.js?v=20260601-04"></script>
+    <script src="js/utils.js?v=20260601-04"></script>
+    <script src="js/account-ui.js?v=20260601-04"></script>
+    <script src="js/admin-ui.js?v=20260601-04"></script>
+    <script src="js/vocabulary-ui.js?v=20260601-04"></script>
+    <script src="js/main.js?v=20260601-04"></script>
 
     <script>
         window.onload = () => { 

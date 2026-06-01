@@ -140,9 +140,11 @@ const AuthUI = {
             }
         }
         if (currentUser) {
-            const btnExtra = ['admin', 'manager'].includes(currentUser.role)
-                ? ''
-                : '';
+            const btnExtra = `
+                <button onclick="openUpgradePlans()" class="h-12 inline-flex items-center gap-2 bg-hanred-600 hover:bg-hanred-700 text-white px-3 sm:px-4 rounded-2xl text-sm font-black shadow-md transition cursor-pointer whitespace-nowrap" title="Nâng cấp gói">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Nâng cấp gói</span>
+                </button>`;
             
             container.innerHTML = `
                 <div class="flex items-center gap-3 relative">
@@ -245,6 +247,20 @@ function toggleMoreMenu() {
     document.getElementById('more-menu')?.classList.toggle('hidden');
     switchMorePanel('account');
     renderMoreUserInfo();
+}
+
+function openUpgradePlans() {
+    document.getElementById('account-menu')?.classList.add('hidden');
+    document.getElementById('avatar-action-menu')?.classList.add('hidden');
+    document.getElementById('more-menu')?.classList.add('hidden');
+
+    if (!currentUser) {
+        AuthUI.openModal(true);
+        return;
+    }
+
+    switchView('view-profile');
+    setTimeout(() => switchUserPanel('user-payment-section'), 50);
 }
 
 function switchMorePanel(panel) {
@@ -1131,8 +1147,9 @@ function renderInputArea(level, clozeData) {
     if (!container) return;
     
     const isAI = !document.getElementById('panel-ai-control').classList.contains('hidden');
+    const isFirstLesson = Number(tabState.currentLessonId) === 1;
 
-    if (isAI || Number(level) === 2 || !clozeData || clozeData.length === 0) {
+    if (isAI || isFirstLesson || Number(level) === 2 || !clozeData || clozeData.length === 0) {
         container.innerHTML = `
             <textarea id="user-input-text" rows="6" 
                 class="w-full p-4 border rounded-xl shadow-inner outline-none focus:border-hanred-500" 

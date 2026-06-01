@@ -12,7 +12,7 @@ TOPIC_LABELS = {
     "Part 4 Cao Cap 6 Cau 54": "TOPIK cao cấp - Câu 54",
     "Part 5 Triet Hoc Tam Ly Kinh Te Vi Mo": "Triết học - Tâm lý - Kinh tế vi mô",
     "Part 6 Thanh Ngu Dong Trai Nghia": "Thành ngữ - Đồng/trái nghĩa",
-    "Thuc Chien Han Viet": "Thực chiến Hán Việt",
+    "Thuc Chien Han Viet": "Thực chiến Hán Hàn",
 }
 
 

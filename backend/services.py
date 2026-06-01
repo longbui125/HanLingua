@@ -50,6 +50,10 @@ def plan_to_days(plan_name=None, fallback_days=None):
         "Gói 6 tháng": 180,
         "Gói 12 tháng": 365,
         "Gói 1 năm": 365,
+        "Premium Monthly": 30,
+        "Premium Quarterly": 90,
+        "Premium Yearly": 365,
+        "HanLingua Pro AI": 30,
     }
     if plan_name in plans:
         return plans[plan_name]

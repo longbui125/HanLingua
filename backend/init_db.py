@@ -1,5 +1,5 @@
 import datetime
-import json, os, re
+import json, os
 import models, auth
 from database import DATA_DIR, SessionLocal, ensure_database_schema
 from storage import is_supabase_storage_enabled, upload_public_file
@@ -50,13 +50,7 @@ if not db.query(models.Lesson).first():
         return []
 
     t1, tv1 = load_json("trans.json"), load_json("trans_vi.json")
-    cloze_1 = []
-    for sentence in t1:
-        words = sentence.split()
-        struct = [{"word": w, "is_blank": (len(re.sub(r'[.,!?~]+', '', w)) > 1 and (i+1)%3==0)} for i, w in enumerate(words)]
-        cloze_1.append(struct)
-    
-    db.add(models.Lesson(title="Bài 1: Sở thích", level=1, category="beginner", audio_url=seed_audio_url("audio.mp3"), transcript=" ".join(t1), translation=" ".join(tv1), cloze_data_json=json.dumps(cloze_1, ensure_ascii=False)))
+    db.add(models.Lesson(title="Bài 1: Sở thích", level=1, category="beginner", audio_url=seed_audio_url("audio.mp3"), transcript=" ".join(t1), translation=" ".join(tv1), cloze_data_json="[]"))
 
     t2, tv2 = load_json("trans_2.json"), load_json("trans_vi_2.json")
     db.add(models.Lesson(title="Bài 2: Thời tiết", level=2, category="intermediate", audio_url=seed_audio_url("audio_2.mp3"), transcript=" ".join(t2), translation=" ".join(tv2), cloze_data_json="[]"))
@@ -66,6 +60,10 @@ for old_url, filename in [("/data/audio.mp3", "audio.mp3"), ("/data/audio_2.mp3"
     lesson = db.query(models.Lesson).filter_by(audio_url=old_url).first()
     if lesson:
         lesson.audio_url = seed_audio_url(filename)
+
+lesson_one = db.query(models.Lesson).filter_by(id=1).first()
+if lesson_one and lesson_one.cloze_data_json != "[]":
+    lesson_one.cloze_data_json = "[]"
 
 if not db.query(models.Vocabulary).first():
     count = 0
