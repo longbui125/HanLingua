@@ -375,12 +375,17 @@ const API = {
     },
 
     async processYouTube(url) {
-        const res = await fetch(`${API_BASE}/process-youtube`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ url })
-        });
-        if (!res.ok) throw new Error((await res.json()).detail || "Lỗi xử lý link YouTube");
+        let res;
+        try {
+            res = await fetch(`${API_BASE}/process-youtube`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ url })
+            });
+        } catch (e) {
+            throw new Error("Không kết nối được tới backend Railway. Hãy kiểm tra Deployments/Logs của Railway, hoặc thử lại sau khi backend redeploy xong.");
+        }
+        if (!res.ok) throw await apiError(res, "Lỗi xử lý link YouTube");
         return res.json();
     }
 };

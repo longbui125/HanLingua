@@ -1,5 +1,5 @@
 import datetime
-import os, json, base64, shutil, re, subprocess, tempfile
+import os, json, base64, shutil, re, subprocess, tempfile, glob
 from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -229,6 +229,7 @@ def get_ytdlp_audio_options(output_template: str):
         "noplaylist": True,
         "retries": 5,
         "fragment_retries": 5,
+        "socket_timeout": 30,
         "http_headers": {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
             "Accept-Language": "en-US,en;q=0.9",
@@ -238,6 +239,38 @@ def get_ytdlp_audio_options(output_template: str):
         },
         "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "m4a"}],
     }
+
+
+def find_downloaded_audio(output_template: str) -> str:
+    candidates = []
+    for ext in ("m4a", "mp3", "webm", "opus", "ogg", "wav", "aac"):
+        candidates.append(f"{output_template}.{ext}")
+    candidates.extend(glob.glob(f"{output_template}.*"))
+    for candidate in candidates:
+        if os.path.exists(candidate) and os.path.getsize(candidate) > 0:
+            return candidate
+    raise RuntimeError("Không tìm thấy file audio sau khi tải YouTube.")
+
+
+def download_youtube_audio(url: str, output_template: str) -> str:
+    if not HAS_YTDLP:
+        raise HTTPException(status_code=501, detail="YouTube processing is not available in this deployment. Please install yt-dlp.")
+    if not isinstance(url, str) or not url.strip():
+        raise HTTPException(status_code=400, detail="Vui lòng dán link YouTube hợp lệ.")
+    if not re.match(r"^https?://", url.strip()):
+        raise HTTPException(status_code=400, detail="Link YouTube cần bắt đầu bằng http:// hoặc https://.")
+
+    try:
+        with yt_dlp.YoutubeDL(get_ytdlp_audio_options(output_template)) as ydl:
+            ydl.download([url.strip()])
+    except HTTPException:
+        raise
+    except Exception as exc:
+        message = str(exc).splitlines()[-1] if str(exc) else repr(exc)
+        raise RuntimeError(f"Không tải được audio từ YouTube. Link có thể bị chặn, riêng tư hoặc yt-dlp trên server cần cập nhật. Chi tiết: {message}") from exc
+
+    return find_downloaded_audio(output_template)
+
 
 def username_suggestions(db: Session, username: str, limit: int = 3):
     base = re.sub(r"[^a-zA-Z0-9_]", "", username.strip()) or "hanlingua"
@@ -597,18 +630,33 @@ async def process_ai(file: UploadFile = File(...), current_user: models.User = D
 @app.post("/api/process-youtube")
 async def process_youtube(data: dict, current_user: models.User = Depends(auth.get_current_user)):
     require_active_trial(current_user)
-    if not HAS_YTDLP:
-        raise HTTPException(status_code=501, detail="YouTube processing is not available in this deployment. Please install yt-dlp.")
     url = data.get("url")
-    ydl_opts = get_ytdlp_audio_options("temp_yt")
-    
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl: 
-        ydl.download([url])
-
-    transcript = generate_transcript_json("temp_yt.m4a")
-    with open("temp_yt.m4a", "rb") as f: audio_b64 = base64.b64encode(f.read()).decode()
-    os.remove("temp_yt.m4a")
-    return {"transcript": " ".join(transcript), "audio_b64": audio_b64, "audio_mime": "audio/mp4"}
+    temp_dir = tempfile.mkdtemp(prefix="hanlingua_yt_")
+    downloaded_audio_path = None
+    prepared_audio_path = None
+    try:
+        output_template = os.path.join(temp_dir, "youtube_audio")
+        downloaded_audio_path = download_youtube_audio(url, output_template)
+        prepared_audio_path = (
+            downloaded_audio_path
+            if downloaded_audio_path.lower().endswith(".mp3")
+            else convert_media_to_mp3(downloaded_audio_path)
+        )
+        transcript = generate_transcript_json(prepared_audio_path)
+        if not transcript:
+            raise HTTPException(status_code=502, detail="Whisper không trả về transcript. Hãy thử link có âm thanh rõ hơn hoặc video ngắn hơn.")
+        with open(prepared_audio_path, "rb") as f:
+            audio_b64 = base64.b64encode(f.read()).decode()
+        return {"transcript": " ".join(transcript), "audio_b64": audio_b64, "audio_mime": "audio/mpeg"}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Lỗi xử lý YouTube: {exc}")
+    finally:
+        if prepared_audio_path and prepared_audio_path != downloaded_audio_path and os.path.exists(prepared_audio_path):
+            os.remove(prepared_audio_path)
+        if os.path.isdir(temp_dir):
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 @app.post("/api/admin/upload-audio")
 async def upload_audio(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):
