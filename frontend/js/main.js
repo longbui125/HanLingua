@@ -1089,6 +1089,7 @@ function switchDictationTab(tab) {
     if (!isAI) {
         loadDefaultData(1);
     } else {
+        tabState.lessonData = { transcript: "", translation: "", audioSrc: "", clozeData: [] };
         renderInputArea(2, []); 
     }
 }
@@ -1132,18 +1133,10 @@ function renderInputArea(level, clozeData) {
     const isAI = !document.getElementById('panel-ai-control').classList.contains('hidden');
 
     if (isAI || Number(level) === 2 || !clozeData || clozeData.length === 0) {
-        const aiTranscriptPanel = isAI && tabState.aiData.transcript ? `
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 min-h-[180px]">
-                <div class="text-sm font-black text-amber-800 mb-2">Transcript AI</div>
-                <div class="mt-3 text-gray-900 leading-relaxed whitespace-pre-wrap">${escapeHtml(tabState.aiData.transcript)}</div>
-            </div>` : '';
         container.innerHTML = `
-            <div class="${isAI && tabState.aiData.transcript ? 'grid md:grid-cols-2 gap-4' : ''}">
-            ${aiTranscriptPanel}
             <textarea id="user-input-text" rows="6" 
                 class="w-full p-4 border rounded-xl shadow-inner outline-none focus:border-hanred-500" 
-                placeholder="Nghe và gõ lại nội dung bài học..."></textarea>
-            </div>`;
+                placeholder="Nghe và gõ lại nội dung bài học..."></textarea>`;
     } else {
 
         let html = '<div class="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-xl">';
@@ -1187,7 +1180,7 @@ async function submitEval() {
                 lesson_id: isAI ? null : tabState.currentLessonId
             });
             markDailyTaskDone('dictation', { refresh: false });
-            renderFeedback(res, { targetText: target, userText, isAI }); 
+            renderFeedback(res);
         } else {
             const inputs = document.querySelectorAll('.cloze-input');
             const answers = Array.from(inputs).map(i => i.value.trim());
@@ -1206,21 +1199,10 @@ async function submitEval() {
     }
 }
 
-function renderFeedback(res, context = {}) {
+function renderFeedback(res) {
     const container = document.getElementById('feedback-container');
     const rows = [];
     const feedback = res.feedback || [];
-    const comparison = context.isAI ? `
-        <div class="grid md:grid-cols-2 gap-4 mb-6">
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <div class="text-xs font-black text-amber-800 uppercase mb-2">Transcript AI</div>
-                <div class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">${escapeHtml(context.targetText || '')}</div>
-            </div>
-            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <div class="text-xs font-black text-gray-600 uppercase mb-2">Bài làm của bạn</div>
-                <div class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">${escapeHtml(context.userText || '')}</div>
-            </div>
-        </div>` : '';
     for (let i = 0; i < feedback.length; i++) {
         const item = feedback[i];
         if (item.status === 'correct') {
@@ -1248,7 +1230,6 @@ function renderFeedback(res, context = {}) {
                 <h4 class="text-xl font-bold">Kết quả nghe chép</h4>
                 <span class="text-4xl font-black text-hanred-500">${res.score_percent}%</span>
             </div>
-            ${comparison}
             <div class="flex flex-wrap gap-3 leading-loose text-lg">
                 ${rows.map(row => {
                     const safeUser = escapeHtml(row.user);
@@ -1319,17 +1300,24 @@ async function processAIFile() {
 
     const status = document.getElementById('ai-status');
     status.innerText = "Đang xử lý AI (Whisper)...";
+    tabState.aiData = { transcript: "", audioB64: "" };
+    document.getElementById('feedback-container').classList.add('hidden');
     
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
 
     try {
         const data = await API.processAIFile(formData);
-        tabState.aiData = data;
+        const transcript = (data.transcript || "").trim();
+        if (!transcript) throw new Error("Whisper chưa nghe ra transcript. Hãy thử file audio rõ hơn hoặc ngắn hơn.");
+        tabState.aiData = {
+            transcript,
+            audioB64: data.audio_b64 || ""
+        };
         
         document.getElementById('audio-container').innerHTML = `
             <audio controls class="w-full">
-                <source src="data:audio/mp3;base64,${data.audio_b64}" type="audio/mp3">
+                <source src="data:audio/mp3;base64,${tabState.aiData.audioB64}" type="audio/mp3">
             </audio>`;
         
         status.innerText = "Xử lý thành công! Hãy bắt đầu nghe chép.";
@@ -1345,14 +1333,21 @@ async function processYouTube() {
 
     const status = document.getElementById('ai-status');
     status.innerText = "Đang tải dữ liệu từ YouTube...";
+    tabState.aiData = { transcript: "", audioB64: "" };
+    document.getElementById('feedback-container').classList.add('hidden');
     
     try {
         const data = await API.processYouTube(url);
-        tabState.aiData = data;
+        const transcript = (data.transcript || "").trim();
+        if (!transcript) throw new Error("Whisper chưa nghe ra transcript. Hãy thử video/audio rõ hơn hoặc ngắn hơn.");
+        tabState.aiData = {
+            transcript,
+            audioB64: data.audio_b64 || ""
+        };
         
         document.getElementById('audio-container').innerHTML = `
             <audio controls class="w-full">
-                <source src="data:audio/mp3;base64,${data.audio_b64}" type="audio/mp3">
+                <source src="data:audio/mp3;base64,${tabState.aiData.audioB64}" type="audio/mp3">
             </audio>`;
             
         status.innerText = "Sẵn sàng!";
