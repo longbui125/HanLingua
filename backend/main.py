@@ -1,5 +1,5 @@
 import datetime
-import os, json, base64, shutil, re
+import os, json, base64, shutil, re, subprocess, tempfile
 from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +22,48 @@ try:
     HAS_YTDLP = True
 except ImportError:
     HAS_YTDLP = False
+
+AI_MEDIA_EXTENSIONS = {
+    ".mp3", ".wav", ".flac", ".ogg", ".m4a", ".aac",
+    ".mp4", ".webm", ".mov", ".mkv", ".avi", ".m4v",
+}
+
+
+def convert_media_to_mp3(input_path: str) -> str:
+    output_file = tempfile.NamedTemporaryFile(prefix="hanlingua_ai_", suffix=".mp3", delete=False)
+    output_path = output_file.name
+    output_file.close()
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i", input_path,
+        "-vn",
+        "-ac", "1",
+        "-ar", "16000",
+        "-codec:a", "libmp3lame",
+        "-b:a", "128k",
+        output_path,
+    ]
+    try:
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=240)
+    except FileNotFoundError as exc:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        raise RuntimeError("FFmpeg chưa được cài trên server nên chưa thể tách audio từ video.") from exc
+    except subprocess.TimeoutExpired as exc:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        raise RuntimeError("File quá dài hoặc xử lý quá lâu. Hãy thử video/audio ngắn hơn.") from exc
+
+    if result.returncode != 0 or not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        stderr_tail = "\n".join((result.stderr or result.stdout or "").strip().splitlines()[-3:])
+        detail = f" Chi tiết: {stderr_tail}" if stderr_tail else ""
+        raise RuntimeError(f"Không thể tách audio từ file này. Hãy kiểm tra video có âm thanh và không bị lỗi.{detail}")
+
+    return output_path
+
 
 # CORS: allow frontend origin from env, defaults to allow all.
 def parse_cors_origins():
@@ -525,16 +567,23 @@ def evaluate_cloze(req: ClozeEvalRequest, db: Session = Depends(get_db), current
 async def process_ai(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):
     require_active_trial(current_user)
     ext = os.path.splitext(file.filename or "")[1].lower() or ".mp3"
-    temp_path = f"temp_ai_{int(datetime.datetime.utcnow().timestamp())}{ext}"
+    if ext not in AI_MEDIA_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Định dạng file chưa hỗ trợ. Hãy dùng audio/video như mp3, wav, m4a, mp4, webm hoặc mov.")
+
+    temp_file = tempfile.NamedTemporaryFile(prefix="hanlingua_upload_", suffix=ext, delete=False)
+    temp_path = temp_file.name
+    temp_file.close()
+    prepared_audio_path = None
     try:
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        transcript = generate_transcript_json(temp_path)
+        prepared_audio_path = temp_path if ext == ".mp3" else convert_media_to_mp3(temp_path)
+        transcript = generate_transcript_json(prepared_audio_path)
         if not transcript:
             raise HTTPException(status_code=502, detail="Whisper không trả về transcript. Hãy thử file audio rõ hơn hoặc ngắn hơn.")
-        with open(temp_path, "rb") as f:
+        with open(prepared_audio_path, "rb") as f:
             audio_b64 = base64.b64encode(f.read()).decode()
-        return {"transcript": " ".join(transcript), "audio_b64": audio_b64}
+        return {"transcript": " ".join(transcript), "audio_b64": audio_b64, "audio_mime": "audio/mpeg"}
     except HTTPException:
         raise
     except Exception as exc:
@@ -542,6 +591,8 @@ async def process_ai(file: UploadFile = File(...), current_user: models.User = D
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+        if prepared_audio_path and prepared_audio_path != temp_path and os.path.exists(prepared_audio_path):
+            os.remove(prepared_audio_path)
 
 @app.post("/api/process-youtube")
 async def process_youtube(data: dict, current_user: models.User = Depends(auth.get_current_user)):
@@ -557,7 +608,7 @@ async def process_youtube(data: dict, current_user: models.User = Depends(auth.g
     transcript = generate_transcript_json("temp_yt.m4a")
     with open("temp_yt.m4a", "rb") as f: audio_b64 = base64.b64encode(f.read()).decode()
     os.remove("temp_yt.m4a")
-    return {"transcript": " ".join(transcript), "audio_b64": audio_b64}
+    return {"transcript": " ".join(transcript), "audio_b64": audio_b64, "audio_mime": "audio/mp4"}
 
 @app.post("/api/admin/upload-audio")
 async def upload_audio(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):

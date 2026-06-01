@@ -1334,7 +1334,7 @@ async function processAIFile() {
         
         document.getElementById('audio-container').innerHTML = `
             <audio controls class="w-full">
-                <source src="data:audio/mp3;base64,${tabState.aiData.audioB64}" type="audio/mp3">
+                <source src="data:${data.audio_mime || 'audio/mpeg'};base64,${tabState.aiData.audioB64}" type="${data.audio_mime || 'audio/mpeg'}">
             </audio>`;
         
         status.innerText = "Xử lý thành công! Hãy bắt đầu nghe chép.";
@@ -1364,7 +1364,7 @@ async function processYouTube() {
         
         document.getElementById('audio-container').innerHTML = `
             <audio controls class="w-full">
-                <source src="data:audio/mp3;base64,${tabState.aiData.audioB64}" type="audio/mp3">
+                <source src="data:${data.audio_mime || 'audio/mpeg'};base64,${tabState.aiData.audioB64}" type="${data.audio_mime || 'audio/mpeg'}">
             </audio>`;
             
         status.innerText = "Sẵn sàng!";
@@ -1577,17 +1577,24 @@ async function loadUserLessonList() {
 
         lessons.forEach(l => {
             const category = l.category || (Number(l.level) === 2 ? 'intermediate' : 'beginner');
+            const lessonNumber = Number(String(l.title || '').match(/\d+/)?.[0] || l.id || 0);
+            const lessonImage = lessonNumber === 1
+                ? 'assets/img_1.jpg'
+                : (lessonNumber === 2 ? 'assets/img_2.jpg' : '');
             const theme = {
                 beginner: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: 'fa-seedling', iconColor: 'text-green-500', play: 'text-green-700' },
                 intermediate: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', icon: 'fa-headphones-simple', iconColor: 'text-blue-500', play: 'text-blue-700' }
             }[category] || { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: 'fa-seedling', iconColor: 'text-green-500', play: 'text-green-700' };
+            const thumbnail = lessonImage
+                ? `<img src="${lessonImage}" alt="${escapeHtml(l.title)}" class="w-full h-full object-cover">`
+                : `<i class="fa-solid ${theme.icon}"></i>`;
 
             const btnHtml = `
                 <button onclick="loadDefaultData(${l.id})" 
                     class="w-full ${theme.bg} border ${theme.border} ${theme.text} p-2 rounded-xl text-sm md:text-base font-bold hover:opacity-80 transition flex justify-between items-center text-left mb-4 shadow-sm cursor-pointer">
                     <div class="flex items-center space-x-3 md:space-x-4">
-                        <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-lg border ${theme.border} shadow-sm flex items-center justify-center ${theme.iconColor}">
-                            <i class="fa-solid ${theme.icon}"></i>
+                        <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-lg border ${theme.border} shadow-sm flex items-center justify-center ${theme.iconColor} overflow-hidden">
+                            ${thumbnail}
                         </div>
                         <span>${l.title}</span>
                     </div>
