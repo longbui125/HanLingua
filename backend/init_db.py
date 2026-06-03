@@ -24,7 +24,7 @@ if not db.query(models.User).filter_by(username="admin").first():
     print(" [+] Tạo thành công Admin (admin / 123456)")
 
 if not db.query(models.User).filter_by(username="user").first():
-    db.add(models.User(username="user", hashed_password=auth.get_password_hash("123456"), role="user", account_status="approved", approved_at=datetime.datetime.utcnow(), trial_expires_at=datetime.datetime.utcnow() + datetime.timedelta(days=5)))
+    db.add(models.User(username="user", hashed_password=auth.get_password_hash("123456"), role="user", account_status="approved", approved_at=datetime.datetime.utcnow(), trial_expires_at=datetime.datetime.utcnow() + datetime.timedelta(days=7)))
     print(" [+] Tạo thành công User thường (user / 123456)")
 
 if not db.query(models.User).filter_by(username="manager").first():

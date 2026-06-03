@@ -407,7 +407,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         role="user",
         account_status="approved",
         approved_at=approved_at,
-        trial_expires_at=approved_at + datetime.timedelta(days=5),
+        trial_expires_at=approved_at + datetime.timedelta(days=7),
     )
     db.add(new_user); db.commit()
     return {"msg": "Tài khoản đã sẵn sàng. Bạn có 5 ngày dùng thử."}
