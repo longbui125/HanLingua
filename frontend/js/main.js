@@ -477,7 +477,6 @@ function initMotionReveal() {
     const targets = Array.from(document.querySelectorAll([
         '.landing-card',
         '.landing-session',
-        '.landing-stat-strip',
         '.workflow-step',
         '.motion-card',
         '.motion-left',
@@ -497,19 +496,27 @@ function initMotionReveal() {
     if (!targets.length) return;
     if (!('IntersectionObserver' in window)) {
         targets.forEach(el => el.classList.add('is-visible'));
+        initScrollLinkedMotion(targets);
         return;
     }
-    if (!window.hanRevealObserver) {
-        window.hanRevealObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('is-visible');
-                window.hanRevealObserver.unobserve(entry.target);
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    if (window.hanRevealObserver) {
+        window.hanRevealObserver.disconnect();
     }
+    window.hanRevealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const target = entry.target;
+            if (entry.isIntersecting && entry.intersectionRatio > 0.08) {
+                target.classList.add('is-visible');
+                target.classList.remove('is-resetting');
+                return;
+            }
+            if (entry.intersectionRatio <= 0.02) {
+                target.classList.remove('is-visible');
+                target.classList.add('is-resetting');
+            }
+        });
+    }, { threshold: [0, 0.08, 0.18, 0.35], rootMargin: '-2% 0px -10% 0px' });
     targets.forEach((el, index) => {
-        if (el.classList.contains('is-visible')) return;
         if (!el.classList.contains('motion-from-left') && !el.classList.contains('motion-from-right') && !el.classList.contains('motion-from-bottom') && !el.classList.contains('motion-pop')) {
             if (el.classList.contains('motion-left')) el.classList.add('motion-from-left');
             else if (el.classList.contains('motion-right')) el.classList.add('motion-from-right');
@@ -518,9 +525,64 @@ function initMotionReveal() {
             else el.classList.add(index % 3 === 0 ? 'motion-from-left' : index % 3 === 1 ? 'motion-from-right' : 'motion-from-bottom');
         }
         el.style.setProperty('--reveal-delay', `${Math.min((index % 6) * 70, 350)}ms`);
-        el.classList.add('reveal-on-scroll');
+        el.classList.add('reveal-on-scroll', 'scroll-motion-ready');
         window.hanRevealObserver.observe(el);
     });
+    initScrollLinkedMotion(targets);
+}
+
+function initScrollLinkedMotion(targets) {
+    if (!targets.length || !('requestAnimationFrame' in window)) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    window.hanScrollMotionTargets = targets;
+    if (!window.hanScrollMotionSchedule) {
+        window.hanScrollMotionFrame = null;
+        window.hanScrollMotionSchedule = () => {
+            if (window.hanScrollMotionFrame) return;
+            window.hanScrollMotionFrame = requestAnimationFrame(() => {
+                window.hanScrollMotionFrame = null;
+                updateScrollLinkedMotion();
+            });
+        };
+        window.addEventListener('scroll', window.hanScrollMotionSchedule, { passive: true });
+        window.addEventListener('resize', window.hanScrollMotionSchedule, { passive: true });
+    }
+    window.hanScrollMotionSchedule();
+}
+
+function updateScrollLinkedMotion() {
+    const targets = window.hanScrollMotionTargets || [];
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+
+    targets.forEach((el, index) => {
+        if (!el.isConnected || el.closest('.hidden')) {
+            resetScrollMotion(el);
+            return;
+        }
+
+        const rect = el.getBoundingClientRect();
+        if (!rect.width || !rect.height || rect.bottom < -120 || rect.top > viewportHeight + 120) {
+            resetScrollMotion(el);
+            return;
+        }
+
+        const centerOffset = ((rect.top + rect.height / 2) - viewportHeight / 2) / viewportHeight;
+        const progress = Math.max(-1, Math.min(1, centerOffset));
+        const direction = index % 2 === 0 ? 1 : -1;
+        const lift = el.classList.contains('quest-card') ? 8 : el.classList.contains('cozy-side-card') ? 16 : 12;
+        const drift = el.classList.contains('overview-mini-stat') ? 3 : 6;
+
+        el.style.setProperty('--scroll-y', `${(-progress * lift).toFixed(2)}px`);
+        el.style.setProperty('--scroll-x', `${(progress * direction * drift).toFixed(2)}px`);
+        el.style.setProperty('--scroll-rotate', `${(-progress * direction * 0.35).toFixed(3)}deg`);
+    });
+}
+
+function resetScrollMotion(el) {
+    el.style.setProperty('--scroll-x', '0px');
+    el.style.setProperty('--scroll-y', '0px');
+    el.style.setProperty('--scroll-rotate', '0deg');
 }
 
 function updateMainNav(viewId) {
@@ -760,7 +822,7 @@ function renderSkillPanel(data) {
 }
 
 function renderLearningOverviewDashboard(data, forecast = null, badgeText = '') {
-    return renderLearningOverviewDashboardV2(data, forecast, badgeText);
+    return renderLearningOverviewDashboardV3(data, forecast, badgeText);
     return `
         <div class="overview-grid">
             <div class="space-y-5">
@@ -825,6 +887,55 @@ function renderLearningOverviewDashboardV2(data, forecast = null, badgeText = ''
                     </div>
                 </div>
             </div>
+        </div>`;
+}
+
+function renderLearningOverviewDashboardV3(data, forecast = null, badgeText = '') {
+    return `
+        <div class="overview-calm-stack">
+            <section class="overview-focus-card motion-left">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span class="bg-white/80 border border-red-100 text-hanred-600 text-xs font-black uppercase px-3 py-1 rounded-full">Phiên học hôm nay</span>
+                        ${badgeText ? `<span class="bg-gray-950 text-white px-3 py-1 rounded-full text-xs font-black">${badgeText}</span>` : ''}
+                    </div>
+                    <h4 class="text-2xl md:text-4xl font-black text-gray-950 leading-tight">Chọn một việc nhỏ để bắt đầu.</h4>
+                    <p class="text-sm md:text-base text-gray-600 mt-3 compact-copy">Không cần nhìn quá nhiều số cùng lúc. Bắt đầu bằng nhiệm vụ hôm nay, sau đó xem tiến độ và gợi ý ôn tập ở bên dưới.</p>
+                </div>
+                <div class="overview-focus-actions">
+                    <button onclick="switchView('view-dictation')" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-3 rounded-lg text-sm font-black shadow cursor-pointer"><i class="fa-solid fa-headphones-simple mr-2"></i>Nghe chép</button>
+                    <button onclick="switchView('view-speaking')" class="bg-white/90 hover:bg-white border border-blue-100 text-blue-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-microphone-lines mr-2"></i>Luyện nói</button>
+                    <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-white/90 hover:bg-white border border-purple-100 text-purple-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-layer-group mr-2"></i>Ôn từ</button>
+                </div>
+            </section>
+
+            ${renderDailyLearningPlan(data)}
+
+            <section class="overview-metrics-panel motion-bottom">
+                <div class="overview-section-head">
+                    <div>
+                        <div class="text-xs font-black text-orange-700 uppercase">Tiến độ gọn</div>
+                        <h4 class="text-xl md:text-2xl font-black text-gray-950 mt-1">Nhìn nhanh, không bị ngợp.</h4>
+                    </div>
+                </div>
+                ${renderOverviewStats(data)}
+            </section>
+
+            <section class="overview-support-grid">
+                ${renderSkillPanel(data)}
+                <div class="cozy-side-card motion-right">
+                    <div class="flex items-center justify-between gap-4 mb-3">
+                        <div>
+                            <div class="text-xs font-black text-gray-500 uppercase">Nhật ký</div>
+                            <h4 class="text-lg font-black text-gray-900">Gần đây</h4>
+                        </div>
+                        <span class="stat-icon bg-green-50 text-green-700"><i class="fa-solid fa-check"></i></span>
+                    </div>
+                    ${renderRecentActivities(data.recent_activities || [])}
+                </div>
+            </section>
+
+            ${renderForecastPanel(forecast)}
         </div>`;
 }
 
@@ -897,7 +1008,7 @@ function renderForecastPanelV2(forecast = null) {
                     Mở thẻ từ
                 </button>
             </div>
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="overview-forecast-grid">
                 <div class="forecast-tile p-4 motion-pop">
                     <div class="text-xs font-black text-purple-600 uppercase">Cần ôn</div>
                     <div class="flex items-end gap-2 mt-2">

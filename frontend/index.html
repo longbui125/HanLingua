@@ -19,7 +19,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="css/style.css?v=20260613-06">
+    <link rel="stylesheet" href="css/style.css?v=20260613-09">
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -974,6 +974,7 @@
 
                 <div class="min-w-0 space-y-8">
                     <section id="user-overview-section" class="user-panel edu-friendly-panel p-4 md:p-6 xl:p-8 min-h-[calc(100vh-130px)]">
+                        <div class="overview-learning-stack">
                         <div class="overview-welcome p-5 md:p-7 mb-6 motion-left">
                             <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5">
                                 <div class="max-w-3xl">
@@ -993,11 +994,11 @@
                                     </button>
                                 </div>
                             </div>
-                            <div id="daily-media" class="cozy-side-card mt-6 motion-right"></div>
                         </div>
 
-                        <div class="overview-live-layout">
-                            <div id="user-progress-summary" class="space-y-5">
+                        <div id="daily-media" class="overview-media-card cozy-side-card motion-right"></div>
+
+                            <div id="user-progress-summary" class="overview-dynamic-stack">
                                 <div class="overview-meter-strip">
                                     <div class="overview-mini-stat motion-pop"><div class="text-xs text-orange-700 font-black uppercase">Streak</div><div class="text-3xl font-black text-orange-600 mt-2">0</div><div class="text-sm text-gray-500 mt-2">ngày</div></div>
                                     <div class="overview-mini-stat motion-pop"><div class="text-xs text-hanred-600 font-black uppercase">Dictation</div><div class="text-3xl font-black text-hanred-600 mt-2">0</div><div class="text-sm text-gray-500 mt-2">bài</div></div>
@@ -1012,7 +1013,7 @@
                                 </div>
                             </div>
 
-                            <aside class="cozy-side-card xl:sticky xl:top-24 motion-right">
+                            <aside class="overview-playlist-card cozy-side-card motion-bottom">
                                 <div class="flex items-center justify-between gap-3 mb-4">
                                     <div>
                                         <div class="text-xs font-black text-purple-700 uppercase">Nghe thêm</div>
@@ -1386,7 +1387,7 @@
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260601-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260613-06"></script>
+    <script src="js/main.js?v=20260613-09"></script>
 
     <script>
         window.onload = () => { 
