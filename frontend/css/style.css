@@ -9,6 +9,11 @@ body { font-family: 'Inter', sans-serif; }
     --han-surface: #ffffff;
     --han-soft: #f8fafc;
     --han-red: #e53935;
+    --han-coral: #fff1f0;
+    --han-mint: #ecfdf5;
+    --han-sky: #eff6ff;
+    --han-lavender: #f5f3ff;
+    --han-cream: #fffaf0;
 }
 
 html {
@@ -17,7 +22,7 @@ html {
 
 body {
     background:
-        linear-gradient(180deg, #ffffff 0%, #f8fafc 38%, #f3f4f6 100%);
+        linear-gradient(180deg, #fffdfb 0%, #f8fafc 42%, #f7f7fb 100%);
 }
 
 button,
@@ -54,6 +59,19 @@ select:focus {
 .motion-card:nth-child(3) { animation-delay: 70ms; }
 .motion-card:nth-child(4) { animation-delay: 105ms; }
 
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+        opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .user-panel:not(.hidden),
 .admin-panel:not(.hidden) {
     animation: hanFadeUp 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -70,15 +88,66 @@ select:focus {
     }
 }
 
+@keyframes hanPatternDrift {
+    from { background-position: 0 0, 0 0, 0 0; }
+    to { background-position: 160px 120px, -140px 90px, 0 0; }
+}
+
+@keyframes hanFloatSoft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+#view-landing,
+#view-profile,
+#view-dictation,
+#view-speaking,
+#view-admin {
+    position: relative;
+    isolation: isolate;
+}
+
+#view-landing::before,
+#view-profile::before,
+#view-dictation::before,
+#view-speaking::before,
+#view-admin::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.72;
+    background-image:
+        linear-gradient(115deg, rgba(229, 57, 53, 0.045) 0 1px, transparent 1px 26px),
+        linear-gradient(25deg, rgba(37, 99, 235, 0.035) 0 1px, transparent 1px 30px),
+        linear-gradient(180deg, #fffdfb, #f8fafc 46%, #f6f7fb);
+    background-size: 180px 180px, 220px 220px, auto;
+    animation: hanPatternDrift 22s linear infinite;
+}
+
+.friendly-surface {
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.78));
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(10px);
+}
+
+.floating-accent {
+    animation: hanFloatSoft 5s ease-in-out infinite;
+}
+
 .learning-workspace {
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 46%, rgba(243, 244, 246, 1) 100%);
+        linear-gradient(180deg, rgba(255, 253, 251, 0.94) 0%, rgba(248, 250, 252, 0.98) 46%, rgba(246, 247, 251, 1) 100%);
 }
 
 .learning-shell {
     border: 1px solid rgba(226, 232, 240, 0.92);
-    background: rgba(255, 255, 255, 0.86);
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.74));
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.07);
     backdrop-filter: blur(12px);
 }
 
@@ -87,7 +156,7 @@ select:focus {
     overflow: hidden;
     border: 1px solid rgba(239, 68, 68, 0.14);
     background:
-        linear-gradient(135deg, #fff7f7 0%, #ffffff 48%, #eef6ff 100%);
+        linear-gradient(135deg, #fff4f2 0%, #ffffff 46%, #eef8ff 100%);
     box-shadow: 0 22px 54px rgba(15, 23, 42, 0.08);
 }
 
@@ -104,14 +173,17 @@ select:focus {
 
 .soft-panel {
     border: 1px solid rgba(226, 232, 240, 0.92);
-    background: rgba(255, 255, 255, 0.92);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.8));
     box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
+    backdrop-filter: blur(8px);
 }
 
 .stat-card {
     min-height: 116px;
     border: 1px solid rgba(226, 232, 240, 0.92);
-    background: rgba(255, 255, 255, 0.95);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82));
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
 }
 
@@ -134,13 +206,44 @@ select:focus {
 .plan-step {
     min-height: 170px;
     border: 1px solid rgba(226, 232, 240, 0.92);
-    background: #ffffff;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.84));
 }
 
 .forecast-tile {
     min-height: 132px;
     border: 1px solid rgba(226, 232, 240, 0.9);
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.84);
+}
+
+#view-dictation,
+#view-speaking,
+#view-admin {
+    background:
+        linear-gradient(180deg, rgba(255, 253, 251, 0.94), rgba(248, 250, 252, 0.98));
+}
+
+#view-dictation .bg-white,
+#view-speaking .bg-white,
+#view-admin .bg-white,
+#view-profile .user-panel.bg-white,
+#view-profile .bg-white {
+    box-shadow: 0 16px 44px rgba(15, 23, 42, 0.055);
+}
+
+#view-dictation .bg-white,
+#view-speaking .bg-white,
+#view-profile .user-panel,
+#view-admin .admin-panel,
+#view-admin aside {
+    backdrop-filter: blur(8px);
+}
+
+#view-dictation button,
+#view-speaking button,
+#view-profile button,
+#view-admin button {
+    will-change: transform;
 }
 
 .skill-meter {
@@ -171,9 +274,9 @@ select:focus {
 
 .landing-hero {
     position: relative;
-    min-height: clamp(640px, 76vh, 760px);
+    min-height: clamp(660px, 78vh, 790px);
     overflow: hidden;
-    background: #f8fafc;
+    background: #fffdfb;
 }
 
 .landing-hero-media {
@@ -187,7 +290,8 @@ select:focus {
     height: 100%;
     object-fit: cover;
     object-position: center;
-    opacity: 0.58;
+    opacity: 0.64;
+    filter: saturate(1.06) contrast(0.98);
 }
 
 .landing-hero::before {
@@ -196,7 +300,7 @@ select:focus {
     inset: 0;
     z-index: 1;
     background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.82) 46%, rgba(255, 255, 255, 0.34) 100%),
+        linear-gradient(90deg, rgba(255, 253, 251, 0.93) 0%, rgba(255, 253, 251, 0.78) 46%, rgba(255, 253, 251, 0.26) 100%),
         linear-gradient(180deg, rgba(248, 250, 252, 0) 78%, #ffffff 100%);
 }
 
@@ -214,20 +318,21 @@ select:focus {
     align-items: center;
     gap: 0.5rem;
     border: 1px solid rgba(229, 57, 53, 0.16);
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.78);
     color: #b91c1c;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
 .landing-pill {
     border: 1px solid rgba(226, 232, 240, 0.95);
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.76);
     box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
 }
 
 .landing-session {
     border: 1px solid rgba(226, 232, 240, 0.95);
-    background: rgba(255, 255, 255, 0.74);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.68));
     border-radius: 0.5rem;
     box-shadow: 0 28px 70px rgba(15, 23, 42, 0.12);
     backdrop-filter: blur(16px);
@@ -276,21 +381,27 @@ select:focus {
 }
 
 .landing-band {
-    background: #ffffff;
+    position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #fffdfb 100%);
     border-top: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .landing-band-muted {
-    background: #f8fafc;
+    position: relative;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 250, 252, 0.95)),
+        repeating-linear-gradient(135deg, rgba(229, 57, 53, 0.035) 0 1px, transparent 1px 26px);
     border-top: 1px solid rgba(226, 232, 240, 0.9);
     border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .landing-card {
     border: 1px solid rgba(226, 232, 240, 0.95);
-    background: #ffffff;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
     border-radius: 0.5rem;
     box-shadow: 0 12px 34px rgba(15, 23, 42, 0.045);
+    backdrop-filter: blur(8px);
 }
 
 .landing-card:hover {

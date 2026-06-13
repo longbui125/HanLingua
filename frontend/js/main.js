@@ -26,6 +26,7 @@ const AuthUI = {
         renderUserAccessState();
         loadDailyContent();
         showWelcomeModal();
+        initMotionReveal();
         if (currentUser && ['admin', 'manager'].includes(currentUser.role)) {
             switchView('view-admin');
         } else if (currentUser) {
@@ -469,6 +470,41 @@ function switchView(viewId) {
         switchUserPanel('user-overview-section');
         loadMyProgress();
     }
+    setTimeout(initMotionReveal, 50);
+}
+
+function initMotionReveal() {
+    const targets = document.querySelectorAll([
+        '.landing-card',
+        '.landing-session',
+        '.landing-stat-strip',
+        '.workflow-step',
+        '.motion-card',
+        '.stat-card',
+        '.plan-step',
+        '.soft-panel',
+        '.user-panel:not(.hidden)',
+        '.admin-panel:not(.hidden)'
+    ].join(','));
+    if (!targets.length) return;
+    if (!('IntersectionObserver' in window)) {
+        targets.forEach(el => el.classList.add('is-visible'));
+        return;
+    }
+    if (!window.hanRevealObserver) {
+        window.hanRevealObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                window.hanRevealObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    }
+    targets.forEach(el => {
+        if (el.classList.contains('is-visible')) return;
+        el.classList.add('reveal-on-scroll');
+        window.hanRevealObserver.observe(el);
+    });
 }
 
 function updateMainNav(viewId) {
@@ -1079,6 +1115,7 @@ function refreshLearningOverviewLocal() {
         null,
         `Ngày ${getCurrentPlanDay(data.learning_day)}`
     );
+    initMotionReveal();
 }
 
 async function loadMyProgress() {
@@ -1102,6 +1139,7 @@ async function loadMyProgress() {
             forecast,
             `Ngày ${data.learning_day} · ${data.stage}`
         );
+        initMotionReveal();
         table.innerHTML = data.monthly.length ? data.monthly.map(m => `
             <tr>
                 <td class="py-3 px-4 font-bold">${m.month}</td>
