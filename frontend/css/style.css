@@ -2667,6 +2667,12 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
     display: none !important;
 }
 
+#user-overview-section .overview-learning-stack {
+    max-width: none;
+    margin: 0;
+    gap: 0;
+}
+
 #user-overview-section #user-progress-summary {
     display: block;
     max-width: none;
@@ -2712,10 +2718,10 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr);
+    grid-template-columns: minmax(720px, 1fr) minmax(360px, 420px);
     gap: clamp(1.15rem, 2.2vw, 1.8rem);
     align-items: start;
-    max-width: 1280px;
+    max-width: 1460px;
     margin: 0 auto;
 }
 
@@ -2738,14 +2744,14 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
 .student-hero-card {
     position: relative;
     overflow: hidden;
-    min-height: clamp(330px, 31vw, 470px);
+    min-height: clamp(360px, 30vw, 470px);
 }
 
 .student-hero-image {
     display: block;
     width: 100%;
     height: 100%;
-    min-height: clamp(330px, 31vw, 470px);
+    min-height: clamp(360px, 30vw, 470px);
     object-fit: cover;
     object-position: center;
 }
@@ -2853,6 +2859,7 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
 .quick-practice-card h4 {
     position: relative;
     z-index: 2;
+    max-width: calc(100% - 78px);
     color: #111827;
     font-size: 0.95rem;
     font-weight: 950;
@@ -3092,6 +3099,21 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
     background: linear-gradient(135deg, #fff7ed, #fff) !important;
 }
 
+.overview-loading-card {
+    display: grid;
+    place-items: center;
+    min-height: 220px;
+    border: 1px solid rgba(254, 205, 211, 0.72);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.86);
+    color: #64748b;
+    font-weight: 800;
+}
+
+.student-overview-shell .quest-board {
+    display: none !important;
+}
+
 .student-overview-shell .quest-board {
     background:
         linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 237, 0.86)),
@@ -3099,8 +3121,8 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
 }
 
 .student-overview-shell .quest-board::before {
-    content: "Kế hoạch học hôm nay";
-    display: block;
+    content: "";
+    display: none;
     color: #111827;
     font-size: 0.82rem;
     font-weight: 950;
@@ -3138,9 +3160,10 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
     50% { transform: translate3d(0, -8px, 0) rotate(2deg); }
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1500px) {
     .student-overview-grid {
         grid-template-columns: 1fr;
+        max-width: 1060px;
     }
 
     .student-side-stack {

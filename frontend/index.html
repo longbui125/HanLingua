@@ -19,7 +19,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="css/style.css?v=20260613-17">
+    <link rel="stylesheet" href="css/style.css?v=20260613-18">
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -975,40 +975,8 @@
                 <div class="min-w-0 space-y-8">
                     <section id="user-overview-section" class="user-panel edu-friendly-panel p-0 min-h-[calc(100vh-130px)]">
                         <div class="overview-learning-stack">
-                        <div class="overview-welcome p-5 md:p-7 mb-6 motion-left">
-                            <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5">
-                                <div class="max-w-3xl">
-                                    <div class="flex flex-wrap items-center gap-2 mb-3">
-                                        <span class="bg-white/80 border border-orange-100 text-orange-700 text-xs font-black uppercase px-3 py-1 rounded-full">Không gian học</span>
-                                        <span id="daily-date-legacy" class="bg-hanred-600 text-white text-xs font-bold px-3 py-1 rounded-full"></span>
-                                    </div>
-                                    <h3 class="text-3xl md:text-5xl font-black text-gray-950 leading-tight">Hôm nay mình học nhẹ thôi.</h3>
-                                    <p id="daily-message-legacy" class="compact-copy text-base md:text-lg text-gray-600 leading-relaxed mt-3">Đang tải thông điệp hôm nay...</p>
-                                </div>
-                                <div class="flex flex-wrap gap-3 xl:justify-end">
-                                    <button onclick="switchView('view-dictation')" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-3 rounded-lg text-sm font-black shadow-lg cursor-pointer">
-                                        <i class="fa-solid fa-play mr-2"></i>Vào học ngay
-                                    </button>
-                                    <button onclick="switchUserPanel('user-progress-section')" class="bg-white/90 hover:bg-white border border-orange-100 text-gray-800 px-5 py-3 rounded-lg text-sm font-black cursor-pointer">
-                                        <i class="fa-solid fa-chart-line mr-2 text-blue-600"></i>Tiến độ
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
                             <div id="user-progress-summary" class="overview-dynamic-stack">
-                                <div class="overview-meter-strip">
-                                    <div class="overview-mini-stat motion-pop"><div class="text-xs text-orange-700 font-black uppercase">Streak</div><div class="text-3xl font-black text-orange-600 mt-2">0</div><div class="text-sm text-gray-500 mt-2">ngày</div></div>
-                                    <div class="overview-mini-stat motion-pop"><div class="text-xs text-hanred-600 font-black uppercase">Dictation</div><div class="text-3xl font-black text-hanred-600 mt-2">0</div><div class="text-sm text-gray-500 mt-2">bài</div></div>
-                                    <div class="overview-mini-stat motion-pop"><div class="text-xs text-blue-700 font-black uppercase">Thời gian</div><div class="text-3xl font-black text-blue-700 mt-2">0 phút</div></div>
-                                    <div class="overview-mini-stat motion-pop"><div class="text-xs text-green-700 font-black uppercase">Độ đúng</div><div class="text-3xl font-black text-green-700 mt-2">0%</div></div>
-                                </div>
-                                <div class="quest-board motion-left">
-                                    <div class="text-xs font-black text-blue-700 uppercase">Nhiệm vụ hôm nay</div>
-                                    <h4 class="text-2xl font-black text-gray-950 mt-1">Nghe, nói, rồi ôn từ.</h4>
-                                    <div class="h-4 w-40 bg-gray-100 rounded-full mb-4"></div>
-                                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-hanred-600 rounded-full" style="width: 0%"></div></div>
-                                </div>
+                                <div class="overview-loading-card motion-pop">Đang tải tổng quan học tập...</div>
                             </div>
 
                             <div id="daily-media-legacy" class="overview-media-card cozy-side-card motion-right"></div>
@@ -1376,7 +1344,7 @@
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260601-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260613-17"></script>
+    <script src="js/main.js?v=20260613-18"></script>
 
     <script>
         window.onload = () => { 

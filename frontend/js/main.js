@@ -1011,27 +1011,6 @@ function renderLearningOverviewDashboardV4(data, forecast = null, badgeText = ''
 
 function renderLearningOverviewDashboard(data, forecast = null, badgeText = '') {
     return renderLearningOverviewDashboardV4(data, forecast, badgeText);
-    return `
-        <div class="overview-grid">
-            <div class="space-y-5">
-                ${renderDailyLearningPlan(data)}
-                ${renderForecastPanel(forecast)}
-            </div>
-            <div class="space-y-5">
-                ${renderOverviewStats(data)}
-                ${renderSkillPanel(data)}
-                <div class="cozy-side-card motion-card">
-                    <div class="flex items-center justify-between gap-4 mb-3">
-                        <div>
-                            <div class="text-xs font-black text-gray-500 uppercase">Nhật ký</div>
-                            <h4 class="text-lg font-black text-gray-900">Gần đây</h4>
-                        </div>
-                        ${badgeText ? `<span class="bg-white/80 text-gray-700 px-3 py-1 rounded-full text-xs font-black border border-orange-100">${badgeText}</span>` : ''}
-                    </div>
-                    ${renderRecentActivities(data.recent_activities || [])}
-                </div>
-            </div>
-        </div>`;
 }
 
 function renderLearningOverviewDashboardV2(data, forecast = null, badgeText = '') {
