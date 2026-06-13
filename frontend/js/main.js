@@ -194,7 +194,9 @@ const AuthUI = {
 function updateLandingAuthActions() {
     const registerCta = document.getElementById('landing-register-cta');
     if (registerCta) {
-        registerCta.classList.toggle('hidden', !!currentUser);
+        const shouldHide = !!currentUser;
+        registerCta.hidden = shouldHide;
+        registerCta.style.display = shouldHide ? 'none' : '';
     }
 }
 
@@ -459,6 +461,7 @@ function switchView(viewId) {
     const target = document.getElementById(viewId);
     if (target) target.classList.remove('hidden');
     updateMainNav(viewId);
+    updateLandingAuthActions();
 
     if (viewId === 'view-admin') {
         const title = document.getElementById('admin-dashboard-title');
