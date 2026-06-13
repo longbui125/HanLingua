@@ -326,7 +326,7 @@ async function loadDailyContent() {
     const mediaEl = document.getElementById('daily-media');
     const playlistEl = document.getElementById('korean-playlist');
     const dateEl = document.getElementById('daily-date');
-    if (!messageEl || !mediaEl || !playlistEl) return;
+    if (!messageEl || !mediaEl) return;
 
     try {
         const data = await API.getDailyContent();
@@ -344,7 +344,7 @@ async function loadDailyContent() {
                 </a>
             </div>`;
         const recommended = data.media;
-        playlistEl.innerHTML = `
+        if (playlistEl) playlistEl.innerHTML = `
             <a href="${recommended.url}" target="_blank" rel="noopener" class="block bg-purple-50 border border-purple-100 hover:bg-purple-100 rounded-2xl px-4 py-4">
                 <div class="text-xs text-purple-600 font-black uppercase mb-1">Gợi ý</div>
                 <div class="font-black text-gray-900 compact-copy">${recommended.title}</div>
@@ -354,7 +354,7 @@ async function loadDailyContent() {
     } catch (e) {
         messageEl.innerText = "Không thể tải nội dung hôm nay. Bạn vẫn có thể bắt đầu bằng một bài nghe ngắn.";
         mediaEl.innerHTML = '';
-        playlistEl.innerHTML = '';
+        if (playlistEl) playlistEl.innerHTML = '';
     }
 }
 
@@ -532,23 +532,13 @@ function initMotionReveal() {
 }
 
 function initScrollLinkedMotion(targets) {
-    if (!targets.length || !('requestAnimationFrame' in window)) return;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    window.hanScrollMotionTargets = targets;
-    if (!window.hanScrollMotionSchedule) {
-        window.hanScrollMotionFrame = null;
-        window.hanScrollMotionSchedule = () => {
-            if (window.hanScrollMotionFrame) return;
-            window.hanScrollMotionFrame = requestAnimationFrame(() => {
-                window.hanScrollMotionFrame = null;
-                updateScrollLinkedMotion();
-            });
-        };
-        window.addEventListener('scroll', window.hanScrollMotionSchedule, { passive: true });
-        window.addEventListener('resize', window.hanScrollMotionSchedule, { passive: true });
+    if (window.hanScrollMotionSchedule) {
+        window.removeEventListener('scroll', window.hanScrollMotionSchedule);
+        window.removeEventListener('resize', window.hanScrollMotionSchedule);
     }
-    window.hanScrollMotionSchedule();
+    window.hanScrollMotionTargets = [];
+    window.hanScrollMotionSchedule = null;
+    targets.forEach(resetScrollMotion);
 }
 
 function updateScrollLinkedMotion() {
@@ -894,38 +884,38 @@ function renderLearningOverviewDashboardV2(data, forecast = null, badgeText = ''
 
 function renderLearningOverviewDashboardV3(data, forecast = null, badgeText = '') {
     return `
-        <div class="overview-calm-stack">
-            <section class="overview-focus-card motion-left">
-                <div>
-                    <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <span class="bg-white/80 border border-red-100 text-hanred-600 text-xs font-black uppercase px-3 py-1 rounded-full">Phiên học hôm nay</span>
-                        ${badgeText ? `<span class="bg-gray-950 text-white px-3 py-1 rounded-full text-xs font-black">${badgeText}</span>` : ''}
-                    </div>
-                    <h4 class="text-2xl md:text-4xl font-black text-gray-950 leading-tight">Chọn một việc nhỏ để bắt đầu.</h4>
-                    <p class="text-sm md:text-base text-gray-600 mt-3 compact-copy">Không cần nhìn quá nhiều số cùng lúc. Bắt đầu bằng nhiệm vụ hôm nay, sau đó xem tiến độ và gợi ý ôn tập ở bên dưới.</p>
-                </div>
-                <div class="overview-focus-actions">
-                    <button onclick="switchView('view-dictation')" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-3 rounded-lg text-sm font-black shadow cursor-pointer"><i class="fa-solid fa-headphones-simple mr-2"></i>Nghe chép</button>
-                    <button onclick="switchView('view-speaking')" class="bg-white/90 hover:bg-white border border-blue-100 text-blue-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-microphone-lines mr-2"></i>Luyện nói</button>
-                    <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-white/90 hover:bg-white border border-purple-100 text-purple-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-layer-group mr-2"></i>Ôn từ</button>
-                </div>
-            </section>
-
-            ${renderDailyLearningPlan(data)}
-
-            <section class="overview-metrics-panel motion-bottom">
+        <div class="overview-calm-stack overview-simple-stack">
+            <section class="overview-metrics-panel overview-primary-progress motion-bottom">
                 <div class="overview-section-head">
                     <div>
                         <div class="text-xs font-black text-orange-700 uppercase">Tiến độ học tập</div>
-                        <h4 class="text-xl md:text-2xl font-black text-gray-950 mt-1">Tiến độ hôm nay.</h4>
+                        <h4 class="text-xl md:text-2xl font-black text-gray-950 mt-1">Nhìn nhanh hôm nay.</h4>
                     </div>
+                    ${badgeText ? `<span class="overview-day-badge">${badgeText}</span>` : ''}
                 </div>
                 ${renderOverviewStats(data)}
             </section>
 
+            ${renderDailyLearningPlan(data)}
+
             <section class="overview-support-grid">
                 ${renderSkillPanel(data)}
-                <div class="cozy-side-card motion-right">
+                <div class="cozy-side-card overview-action-card motion-right">
+                    <div>
+                        <div class="text-xs font-black text-hanred-600 uppercase">Bắt đầu nhanh</div>
+                        <h4 class="text-lg font-black text-gray-900 mt-1">Chọn kỹ năng muốn luyện.</h4>
+                    </div>
+                    <div class="overview-focus-actions">
+                        <button onclick="switchView('view-dictation')" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-3 rounded-lg text-sm font-black shadow cursor-pointer"><i class="fa-solid fa-headphones-simple mr-2"></i>Nghe chép</button>
+                        <button onclick="switchView('view-speaking')" class="bg-white/90 hover:bg-white border border-blue-100 text-blue-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-microphone-lines mr-2"></i>Luyện nói</button>
+                        <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-white/90 hover:bg-white border border-purple-100 text-purple-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-layer-group mr-2"></i>Ôn từ</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="overview-support-grid overview-bottom-grid">
+                ${renderForecastPanel(forecast)}
+                <div class="cozy-side-card overview-recent-card motion-right">
                     <div class="flex items-center justify-between gap-4 mb-3">
                         <div>
                             <div class="text-xs font-black text-gray-500 uppercase">Nhật ký</div>
@@ -936,8 +926,6 @@ function renderLearningOverviewDashboardV3(data, forecast = null, badgeText = ''
                     ${renderRecentActivities(data.recent_activities || [])}
                 </div>
             </section>
-
-            ${renderForecastPanel(forecast)}
         </div>`;
 }
 
