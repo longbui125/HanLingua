@@ -339,12 +339,12 @@ async function loadDailyContent() {
     const mediaEl = document.getElementById('daily-media');
     const playlistEl = document.getElementById('korean-playlist');
     const dateEl = document.getElementById('daily-date');
-    if (!messageEl || !mediaEl) return;
+    if (!mediaEl) return;
 
     try {
         const data = await API.getDailyContent();
         if (dateEl) dateEl.innerText = data.date;
-        messageEl.innerText = data.message;
+        if (messageEl) messageEl.innerText = data.message;
         mediaEl.innerHTML = `
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div class="min-w-0">
@@ -365,7 +365,7 @@ async function loadDailyContent() {
                 <div class="text-xs text-purple-700 font-black mt-3">Mở bài <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></div>
             </a>`;
     } catch (e) {
-        messageEl.innerText = "Không thể tải nội dung hôm nay. Bạn vẫn có thể bắt đầu bằng một bài nghe ngắn.";
+        if (messageEl) messageEl.innerText = "Không thể tải nội dung hôm nay. Bạn vẫn có thể bắt đầu bằng một bài nghe ngắn.";
         mediaEl.innerHTML = '';
         if (playlistEl) playlistEl.innerHTML = '';
     }
@@ -995,11 +995,9 @@ function renderLearningOverviewDashboardV4(data, forecast = null, badgeText = ''
                         <img src="assets/img_3.png" alt="HanLingua Korean study overview" class="student-hero-image">
                         <div class="student-hero-note">
                             <span id="daily-date" class="student-date-pill"></span>
-                            <p id="daily-message">Đang tải thông điệp hôm nay...</p>
                         </div>
                     </section>
                     ${renderQuickPracticeCards()}
-                    ${renderDailyLearningPlan(data)}
                 </div>
                 <aside class="student-side-stack">
                     ${renderOverviewProgressCard(data, badgeText)}
