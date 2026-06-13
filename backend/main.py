@@ -271,6 +271,11 @@ def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = No
         "YTDLP_USER_AGENT",
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
     )
+    player_clients = [
+        client.strip()
+        for client in os.environ.get("YTDLP_PLAYER_CLIENTS", "").split(",")
+        if client.strip()
+    ]
     opts = {
         "format": format_selector or YTDLP_FORMAT_FALLBACKS[0],
         "outtmpl": output_template,
@@ -284,13 +289,12 @@ def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = No
             "User-Agent": user_agent,
             "Accept-Language": "en-US,en;q=0.9",
         },
-        "extractor_args": {
-            "youtube": {"player_client": ["web", "android", "ios"]},
-        },
         "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "m4a"}],
     }
     if cookiefile:
         opts["cookiefile"] = cookiefile
+    if player_clients:
+        opts["extractor_args"] = {"youtube": {"player_client": player_clients}}
     return opts
 
 
