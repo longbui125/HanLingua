@@ -474,18 +474,26 @@ function switchView(viewId) {
 }
 
 function initMotionReveal() {
-    const targets = document.querySelectorAll([
+    const targets = Array.from(document.querySelectorAll([
         '.landing-card',
         '.landing-session',
         '.landing-stat-strip',
         '.workflow-step',
         '.motion-card',
+        '.motion-left',
+        '.motion-right',
+        '.motion-bottom',
+        '.motion-pop',
         '.stat-card',
         '.plan-step',
         '.soft-panel',
+        '.overview-hero-card',
+        '.quest-card',
+        '.cozy-side-card',
+        '.overview-mini-stat',
         '.user-panel:not(.hidden)',
         '.admin-panel:not(.hidden)'
-    ].join(','));
+    ].join(',')));
     if (!targets.length) return;
     if (!('IntersectionObserver' in window)) {
         targets.forEach(el => el.classList.add('is-visible'));
@@ -500,8 +508,16 @@ function initMotionReveal() {
             });
         }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     }
-    targets.forEach(el => {
+    targets.forEach((el, index) => {
         if (el.classList.contains('is-visible')) return;
+        if (!el.classList.contains('motion-from-left') && !el.classList.contains('motion-from-right') && !el.classList.contains('motion-from-bottom') && !el.classList.contains('motion-pop')) {
+            if (el.classList.contains('motion-left')) el.classList.add('motion-from-left');
+            else if (el.classList.contains('motion-right')) el.classList.add('motion-from-right');
+            else if (el.classList.contains('motion-bottom')) el.classList.add('motion-from-bottom');
+            else if (el.classList.contains('motion-pop')) el.classList.add('motion-pop');
+            else el.classList.add(index % 3 === 0 ? 'motion-from-left' : index % 3 === 1 ? 'motion-from-right' : 'motion-from-bottom');
+        }
+        el.style.setProperty('--reveal-delay', `${Math.min((index % 6) * 70, 350)}ms`);
         el.classList.add('reveal-on-scroll');
         window.hanRevealObserver.observe(el);
     });
@@ -648,7 +664,7 @@ function buildLocalProgressSummary(serverData = null) {
 function skillBar(label, value, colorClass) {
     const safeValue = Math.max(0, Math.min(100, Number(value || 0)));
     return `
-        <div class="rounded-2xl bg-gray-50 border border-gray-100 p-4">
+        <div class="rounded-lg bg-white/70 border border-orange-100 p-4">
             <div class="flex justify-between text-sm font-black mb-2">
                 <span class="text-gray-700">${label}</span>
                 <span class="text-gray-900">${safeValue}%</span>
@@ -661,21 +677,21 @@ function skillBar(label, value, colorClass) {
 
 function renderMetricCard({ label, value, caption, icon, accentClass, iconClass }) {
     return `
-        <div class="stat-card motion-card rounded-2xl p-5">
+        <div class="overview-mini-stat motion-pop">
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <div class="text-xs text-gray-500 font-black uppercase tracking-wide">${label}</div>
+                    <div class="text-xs text-gray-500 font-black uppercase">${label}</div>
                     <div class="text-3xl font-black ${accentClass} mt-2 leading-none">${value}</div>
                 </div>
                 <span class="stat-icon ${iconClass}"><i class="fa-solid ${icon}"></i></span>
             </div>
-            <div class="text-sm text-gray-500 mt-4">${caption}</div>
+            <div class="text-sm text-gray-500 mt-3">${caption}</div>
         </div>`;
 }
 
 function renderOverviewStats(data) {
     return `
-        <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
+        <div class="overview-meter-strip">
             ${renderMetricCard({
                 label: 'Streak',
                 value: `${data.streak_days || 0}`,
@@ -727,11 +743,11 @@ function renderRecentActivities(activities = []) {
 
 function renderSkillPanel(data) {
     return `
-        <div class="soft-panel rounded-2xl p-5 motion-card">
+        <div class="cozy-side-card motion-right">
             <div class="flex items-center justify-between gap-3 mb-4">
                 <div>
                     <div class="text-xs font-black text-blue-700 uppercase">Kỹ năng</div>
-                    <h4 class="text-lg font-black text-gray-900">Bản đồ hiện tại</h4>
+                    <h4 class="text-lg font-black text-gray-900">Bạn đang lên nhịp</h4>
                 </div>
                 <span class="stat-icon bg-blue-50 text-blue-700"><i class="fa-solid fa-chart-simple"></i></span>
             </div>
@@ -744,20 +760,23 @@ function renderSkillPanel(data) {
 }
 
 function renderLearningOverviewDashboard(data, forecast = null, badgeText = '') {
+    return renderLearningOverviewDashboardV2(data, forecast, badgeText);
     return `
-        ${renderOverviewStats(data)}
-        ${renderDailyLearningPlan(data)}
-        <div class="grid 2xl:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] gap-5">
-            ${renderForecastPanel(forecast)}
+        <div class="overview-grid">
             <div class="space-y-5">
+                ${renderDailyLearningPlan(data)}
+                ${renderForecastPanel(forecast)}
+            </div>
+            <div class="space-y-5">
+                ${renderOverviewStats(data)}
                 ${renderSkillPanel(data)}
-                <div class="soft-panel rounded-2xl p-5 motion-card">
+                <div class="cozy-side-card motion-card">
                     <div class="flex items-center justify-between gap-4 mb-3">
                         <div>
                             <div class="text-xs font-black text-gray-500 uppercase">Nhật ký</div>
                             <h4 class="text-lg font-black text-gray-900">Gần đây</h4>
                         </div>
-                        ${badgeText ? `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-black">${badgeText}</span>` : ''}
+                        ${badgeText ? `<span class="bg-white/80 text-gray-700 px-3 py-1 rounded-full text-xs font-black border border-orange-100">${badgeText}</span>` : ''}
                     </div>
                     ${renderRecentActivities(data.recent_activities || [])}
                 </div>
@@ -765,7 +784,52 @@ function renderLearningOverviewDashboard(data, forecast = null, badgeText = '') 
         </div>`;
 }
 
+function renderLearningOverviewDashboardV2(data, forecast = null, badgeText = '') {
+    return `
+        <div class="overview-stage">
+            <section class="overview-hero-card motion-left">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span class="bg-white/80 border border-red-100 text-hanred-600 text-xs font-black uppercase px-3 py-1 rounded-full">Studio học hôm nay</span>
+                        ${badgeText ? `<span class="bg-gray-950 text-white px-3 py-1 rounded-full text-xs font-black">${badgeText}</span>` : ''}
+                    </div>
+                    <h4 class="text-2xl md:text-4xl font-black text-gray-950 leading-tight">Học một chút, nhưng đúng nhịp.</h4>
+                    <p class="text-sm md:text-base text-gray-600 mt-3 compact-copy">HanLingua gợi ý phiên học gọn: nghe chép, nói, rồi ôn từ. Bạn chọn nhiệm vụ, hệ thống giữ lại tiến độ.</p>
+                    <div class="flex flex-wrap gap-3 mt-5">
+                        <button onclick="switchView('view-dictation')" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-3 rounded-lg text-sm font-black shadow cursor-pointer"><i class="fa-solid fa-headphones-simple mr-2"></i>Dictation</button>
+                        <button onclick="switchView('view-speaking')" class="bg-white/85 hover:bg-white border border-blue-100 text-blue-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-microphone-lines mr-2"></i>Speaking</button>
+                        <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-white/85 hover:bg-white border border-purple-100 text-purple-700 px-5 py-3 rounded-lg text-sm font-black cursor-pointer"><i class="fa-solid fa-layer-group mr-2"></i>Forecast</button>
+                    </div>
+                </div>
+                <div>
+                    ${renderOverviewStats(data)}
+                </div>
+            </section>
+
+            <div class="overview-flow-grid">
+                <div class="space-y-5 motion-left">
+                    ${renderDailyLearningPlan(data)}
+                    ${renderForecastPanel(forecast)}
+                </div>
+                <div class="overview-side-stack motion-right">
+                    ${renderSkillPanel(data)}
+                    <div class="cozy-side-card motion-right">
+                        <div class="flex items-center justify-between gap-4 mb-3">
+                            <div>
+                                <div class="text-xs font-black text-gray-500 uppercase">Nhật ký</div>
+                                <h4 class="text-lg font-black text-gray-900">Gần đây</h4>
+                            </div>
+                            <span class="stat-icon bg-green-50 text-green-700"><i class="fa-solid fa-check"></i></span>
+                        </div>
+                        ${renderRecentActivities(data.recent_activities || [])}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+}
+
 function renderForecastPanel(forecast = null) {
+    return renderForecastPanelV2(forecast);
     const data = forecast || {
         review_count: 0,
         review_topic: 'lỗi sai gần đây',
@@ -775,19 +839,19 @@ function renderForecastPanel(forecast = null) {
         notification: 'Hoàn thành thêm bài để Forecast tốt hơn.'
     };
     return `
-        <div class="soft-panel rounded-2xl p-5 motion-card">
+        <div class="cozy-side-card motion-card">
             <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
                 <div>
-                    <div class="text-xs font-black text-purple-700 uppercase">Forecast</div>
-                    <h4 class="text-xl font-black text-gray-900 mt-1">Gợi ý ôn hôm nay</h4>
+                    <div class="text-xs font-black text-purple-700 uppercase">Góc ôn tập</div>
+                    <h4 class="text-xl font-black text-gray-900 mt-1">Nhắc nhẹ hôm nay</h4>
                     <p class="text-sm text-gray-500 mt-2 compact-copy">${escapeHtml(data.notification || '')}</p>
                 </div>
-                <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-xl text-sm font-black shadow cursor-pointer">
+                <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-lg text-sm font-black shadow cursor-pointer">
                     Mở thẻ từ
                 </button>
             </div>
             <div class="grid md:grid-cols-2 gap-3">
-                <div class="forecast-tile rounded-2xl p-4">
+                <div class="forecast-tile p-4">
                     <div class="text-xs font-black text-purple-600 uppercase">Cần ôn</div>
                     <div class="flex items-end gap-2 mt-2">
                         <div class="text-3xl font-black text-purple-700 leading-none">${data.review_count || 0}</div>
@@ -795,15 +859,62 @@ function renderForecastPanel(forecast = null) {
                     </div>
                     <p class="text-sm text-gray-500 mt-3 compact-copy">${escapeHtml(data.review_topic || 'lỗi sai gần đây')}</p>
                 </div>
-                <div class="forecast-tile rounded-2xl p-4">
+                <div class="forecast-tile p-4">
                     <div class="text-xs font-black text-hanred-600 uppercase">Lỗi chính</div>
                     <p class="text-sm text-gray-600 mt-3 compact-copy">${escapeHtml(data.mistake_forecast?.message || '')}</p>
                 </div>
-                <div class="forecast-tile rounded-2xl p-4">
+                <div class="forecast-tile p-4">
                     <div class="text-xs font-black text-blue-700 uppercase">Việc tiếp theo</div>
                     <p class="text-sm text-gray-600 mt-3 compact-copy">${escapeHtml(data.suggested_lesson || '')}</p>
                 </div>
-                <div class="forecast-tile rounded-2xl p-4">
+                <div class="forecast-tile p-4">
+                    <div class="text-xs font-black text-green-700 uppercase">TOPIK</div>
+                    <div class="text-2xl font-black text-green-700 mt-2">${data.weekly_insight?.days_to_topik || 45} ngày</div>
+                    <p class="text-sm text-gray-500 mt-3 compact-copy">${escapeHtml(data.weekly_insight?.message || '')}</p>
+                </div>
+            </div>
+        </div>`;
+}
+
+function renderForecastPanelV2(forecast = null) {
+    const data = forecast || {
+        review_count: 0,
+        review_topic: 'lỗi sai gần đây',
+        suggested_lesson: 'Làm thêm Dictation để có gợi ý.',
+        mistake_forecast: { message: 'Chưa đủ dữ liệu lỗi.' },
+        weekly_insight: { days_to_topik: 45, message: 'Duy trì 15 phút/ngày.' },
+        notification: 'Hoàn thành thêm bài để Forecast tốt hơn.'
+    };
+    return `
+        <div class="cozy-side-card motion-bottom">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
+                <div>
+                    <div class="text-xs font-black text-purple-700 uppercase">Góc ôn tập</div>
+                    <h4 class="text-xl font-black text-gray-900 mt-1">Nhắc nhẹ hôm nay</h4>
+                    <p class="text-sm text-gray-500 mt-2 compact-copy">${escapeHtml(data.notification || '')}</p>
+                </div>
+                <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-lg text-sm font-black shadow cursor-pointer">
+                    Mở thẻ từ
+                </button>
+            </div>
+            <div class="grid md:grid-cols-4 gap-3">
+                <div class="forecast-tile p-4 motion-pop">
+                    <div class="text-xs font-black text-purple-600 uppercase">Cần ôn</div>
+                    <div class="flex items-end gap-2 mt-2">
+                        <div class="text-3xl font-black text-purple-700 leading-none">${data.review_count || 0}</div>
+                        <div class="text-sm text-gray-500 pb-1">thẻ</div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3 compact-copy">${escapeHtml(data.review_topic || 'lỗi sai gần đây')}</p>
+                </div>
+                <div class="forecast-tile p-4 motion-pop">
+                    <div class="text-xs font-black text-hanred-600 uppercase">Lỗi chính</div>
+                    <p class="text-sm text-gray-600 mt-3 compact-copy">${escapeHtml(data.mistake_forecast?.message || '')}</p>
+                </div>
+                <div class="forecast-tile p-4 motion-pop">
+                    <div class="text-xs font-black text-blue-700 uppercase">Việc tiếp theo</div>
+                    <p class="text-sm text-gray-600 mt-3 compact-copy">${escapeHtml(data.suggested_lesson || '')}</p>
+                </div>
+                <div class="forecast-tile p-4 motion-pop">
                     <div class="text-xs font-black text-green-700 uppercase">TOPIK</div>
                     <div class="text-2xl font-black text-green-700 mt-2">${data.weekly_insight?.days_to_topik || 45} ngày</div>
                     <p class="text-sm text-gray-500 mt-3 compact-copy">${escapeHtml(data.weekly_insight?.message || '')}</p>
@@ -1054,54 +1165,55 @@ function renderDailyLearningPlan(data) {
             ? 'bg-blue-50 border-blue-100 text-blue-700'
             : 'bg-green-50 border-green-100 text-green-700';
     return `
-        <div class="soft-panel rounded-2xl p-5 motion-card">
+        <div class="quest-board motion-left">
             <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4 mb-5">
                 <div>
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                         <span class="bg-hanred-600 text-white text-xs font-black px-3 py-1 rounded-full">Ngày ${dayNumber}</span>
-                        <span class="bg-gray-100 text-gray-700 text-xs font-black px-3 py-1 rounded-full">${plan.totalMinutes} phút</span>
+                        <span class="bg-white/80 border border-blue-100 text-gray-700 text-xs font-black px-3 py-1 rounded-full">${plan.totalMinutes} phút</span>
                     </div>
-                    <h4 class="text-2xl font-black text-gray-900">${plan.title}</h4>
+                    <h4 class="text-2xl md:text-3xl font-black text-gray-950">Nhiệm vụ: ${plan.title}</h4>
+                    <p class="text-sm text-gray-600 mt-2">Hoàn thành từng bước nhỏ, không cần học quá nặng.</p>
                 </div>
                 <div class="grid sm:grid-cols-[minmax(0,1fr)_112px] gap-3 w-full xl:w-[360px]">
-                    <div class="${trackBadgeClass} border rounded-2xl px-4 py-3">
+                    <div class="${trackBadgeClass} border rounded-lg px-4 py-3">
                         <div class="text-xs font-black uppercase mb-2">Cấp độ</div>
-                        <select onchange="setLearningLevel(this.value)" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-black outline-none">
+                        <select onchange="setLearningLevel(this.value)" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-black outline-none">
                             <option value="beginner" ${plan.track.key === 'beginner' ? 'selected' : ''}>Người mới bắt đầu</option>
                             <option value="intermediate" ${plan.track.key === 'intermediate' ? 'selected' : ''}>Trung cấp</option>
                         </select>
                     </div>
-                    <div class="bg-red-50 border border-red-100 rounded-2xl px-4 py-3">
+                    <div class="bg-red-50 border border-red-100 rounded-lg px-4 py-3">
                         <div class="text-xs font-black text-hanred-600 uppercase">Xong</div>
                         <div class="text-3xl font-black text-hanred-600 leading-none mt-2">${percent}%</div>
                     </div>
                 </div>
             </div>
             <div class="skill-meter h-2.5 bg-gray-100 rounded-full overflow-hidden mb-5"><div class="h-full bg-hanred-600 rounded-full transition-all" style="width: ${percent}%"></div></div>
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="mission-strip">
                 ${plan.tasks.map((task, index) => {
                     const checked = !!state.tasks[task.id];
                     const icon = task.id === 'dictation' ? 'fa-headphones-simple' : task.id === 'speaking' ? 'fa-microphone-lines' : 'fa-layer-group';
                     return `
-                        <div class="plan-step ${checked ? 'border-green-200 bg-green-50' : ''} rounded-2xl p-4 flex flex-col justify-between">
+                        <div class="quest-card motion-pop ${checked ? 'border-green-200 bg-green-50' : ''} flex flex-col justify-between">
                             <div>
                                 <div class="flex items-start justify-between gap-3 mb-4">
-                                    <span class="stat-icon ${checked ? 'bg-green-600 text-white' : 'bg-gray-50 text-gray-600'}"><i class="fa-solid ${checked ? 'fa-check' : icon}"></i></span>
+                                    <span class="stat-icon ${checked ? 'bg-green-600 text-white' : index === 0 ? 'bg-red-50 text-hanred-600' : index === 1 ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'}"><i class="fa-solid ${checked ? 'fa-check' : icon}"></i></span>
                                     <div class="text-xs font-black text-gray-400 uppercase">${task.minutes} phút</div>
                                 </div>
                                 <div>
-                                    <div class="text-xs font-black text-gray-400 uppercase">Bước ${index + 1}</div>
+                                    <div class="text-xs font-black text-gray-400 uppercase">Nhiệm vụ ${index + 1}</div>
                                     <div class="font-black text-gray-900 text-lg mt-1">${task.label}</div>
                                 </div>
                                 <p class="text-sm text-gray-500 mt-2 compact-copy">${task.description}</p>
                             </div>
-                            <button onclick="startDailyTask(${dayNumber}, '${task.id}')" class="mt-5 w-full ${checked ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-black'} text-white px-4 py-2.5 rounded-xl text-sm font-black cursor-pointer">${checked ? 'Đã xong' : 'Bắt đầu'}</button>
+                            <button onclick="startDailyTask(${dayNumber}, '${task.id}')" class="mt-5 w-full ${checked ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-black'} text-white px-4 py-2.5 rounded-lg text-sm font-black cursor-pointer">${checked ? 'Đã xong' : 'Bắt đầu'}</button>
                         </div>`;
                 }).join('')}
             </div>
-            <div class="mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+            <div class="mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white/70 border border-blue-100 rounded-lg p-4">
                 <div class="text-sm text-gray-600"><b>${doneCount}/${plan.tasks.length}</b> việc đã xong</div>
-                <button id="btn-complete-day" onclick="completeLearningDay(${dayNumber})" ${doneCount < plan.tasks.length || state.completed ? 'disabled' : ''} class="px-5 py-3 rounded-xl text-sm font-black transition ${state.completed ? 'bg-green-100 text-green-700' : doneCount < plan.tasks.length ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-hanred-600 hover:bg-hanred-700 text-white cursor-pointer'}">${state.completed ? `Đã hoàn thành` : `Hoàn thành ngày ${dayNumber}`}</button>
+                <button id="btn-complete-day" onclick="completeLearningDay(${dayNumber})" ${doneCount < plan.tasks.length || state.completed ? 'disabled' : ''} class="px-5 py-3 rounded-lg text-sm font-black transition ${state.completed ? 'bg-green-100 text-green-700' : doneCount < plan.tasks.length ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-hanred-600 hover:bg-hanred-700 text-white cursor-pointer'}">${state.completed ? `Đã hoàn thành` : `Hoàn thành ngày ${dayNumber}`}</button>
             </div>
         </div>`;
 }
@@ -1496,6 +1608,7 @@ function switchAdminPanel(panelId) {
     const activeButton = document.querySelector(`[data-admin-nav="${panelId}"]`);
     setSideNavActive(buttons, activeButton, ['bg-blue-50', 'text-blue-700', 'border-r-4', 'border-blue-600']);
     if (panelId === 'admin-vocabulary-section') AdminUI.loadVocabulary();
+    setTimeout(initMotionReveal, 30);
 }
 
 function switchUserPanel(panelId) {
@@ -1505,6 +1618,7 @@ function switchUserPanel(panelId) {
     const activeButton = document.querySelector(`[data-user-nav="${panelId}"]`);
     setSideNavActive(buttons, activeButton, ['sidebar-pulse', 'bg-red-50', 'text-hanred-700', 'border-r-4', 'border-hanred-600']);
     if (panelId === 'user-vocabulary-section') VocabularyUI.load();
+    setTimeout(initMotionReveal, 30);
 }
 
 function toggleLearningSidebar() {
