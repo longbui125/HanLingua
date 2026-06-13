@@ -1709,15 +1709,16 @@ async function loadMyProgress() {
 function switchDictationTab(tab) {
     const isAI = tab === 'ai';
     
-    // Đổi trạng thái nút tab
-    document.getElementById('btn-tab-default').className = isAI ? "px-6 py-2 bg-white text-gray-600 font-bold rounded-lg border border-gray-200" : "px-6 py-2 bg-hanred-600 text-white font-bold rounded-lg shadow";
-    document.getElementById('btn-tab-ai').className = isAI ? "px-6 py-2 bg-hanred-600 text-white font-bold rounded-lg shadow" : "px-6 py-2 bg-white text-gray-600 font-bold rounded-lg border border-gray-200";
+    const inactiveTabClass = "dictation-tab cursor-pointer";
+    const activeTabClass = "dictation-tab is-active cursor-pointer";
+    document.getElementById('btn-tab-default').className = isAI ? inactiveTabClass : activeTabClass;
+    document.getElementById('btn-tab-ai').className = isAI ? activeTabClass : inactiveTabClass;
 
     document.getElementById('panel-default-control').classList.toggle('hidden', isAI);
     document.getElementById('panel-ai-control').classList.toggle('hidden', !isAI);
     
     // Xóa sạch nội dung cũ để không bị lẫn
-    document.getElementById('audio-container').innerHTML = '<audio controls style="width: 100%;" src=""></audio>';
+    document.getElementById('audio-container').innerHTML = '<audio controls class="dictation-native-audio" src=""></audio>';
     document.getElementById('input-area-container').innerHTML = '';
     document.getElementById('feedback-container').classList.add('hidden');
     document.getElementById('translation-section').classList.add('hidden');
@@ -1731,8 +1732,22 @@ function switchDictationTab(tab) {
         loadDefaultData(1);
     } else {
         tabState.lessonData = { transcript: "", translation: "", audioSrc: "", clozeData: [] };
+        setDictationHeader({
+            title: 'AI Dictation',
+            badge: 'Tự tạo',
+            subtitle: 'Tải bài nghe của bạn, để AI nghe ra transcript rồi chép lại nội dung.'
+        });
         renderInputArea(2, []); 
     }
+}
+
+function setDictationHeader({ title, badge, subtitle }) {
+    const titleEl = document.getElementById('dictation-lesson-title');
+    const badgeEl = document.getElementById('dictation-lesson-badge');
+    const subtitleEl = document.getElementById('dictation-lesson-subtitle');
+    if (titleEl) titleEl.innerText = title || 'Dictation';
+    if (badgeEl) badgeEl.innerText = badge || 'Bài nghe';
+    if (subtitleEl) subtitleEl.innerText = subtitle || 'Nghe thật kỹ và chép lại nội dung bạn nghe được.';
 }
 
 // Lessons logic
@@ -1748,12 +1763,17 @@ async function loadDefaultData(id) {
             audioSrc: resolveAssetUrl(data.audio_src), 
             clozeData: data.cloze_data 
         };
+        setDictationHeader({
+            title: data.title || `Bài ${data.id || ''}`,
+            badge: Number(data.level) === 2 ? 'Trung cấp' : 'Sơ cấp',
+            subtitle: 'Nghe thật kỹ và chép lại nội dung bạn nghe được.'
+        });
 
         document.getElementById('feedback-container').classList.add('hidden');
         document.getElementById('translation-box').classList.add('hidden');
         
         // Load Audio
-        document.getElementById('audio-container').innerHTML = `<audio controls style="width: 100%;"><source src="${tabState.lessonData.audioSrc}" type="audio/mp3"></audio>`;
+        document.getElementById('audio-container').innerHTML = `<audio controls class="dictation-native-audio"><source src="${tabState.lessonData.audioSrc}" type="audio/mp3"></audio>`;
         
         // Load Transcript
         if (data.translation) {
@@ -1776,12 +1796,16 @@ function renderInputArea(level, clozeData) {
 
     if (isAI || isFirstLesson || Number(level) === 2 || !clozeData || clozeData.length === 0) {
         container.innerHTML = `
-            <textarea id="user-input-text" rows="6" 
-                class="w-full p-4 border rounded-xl shadow-inner outline-none focus:border-hanred-500" 
-                placeholder="Nghe và gõ lại nội dung bài học..."></textarea>`;
+            <div class="dictation-textarea-shell">
+                <i class="fa-solid fa-pen"></i>
+                <textarea id="user-input-text" rows="7"
+                    class="dictation-writing-textarea outline-none"
+                    placeholder="Nhập nội dung bạn nghe được ở đây..."></textarea>
+                <div class="dictation-textarea-hint">Nhấn Enter để xuống dòng</div>
+            </div>`;
     } else {
 
-        let html = '<div class="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-xl">';
+        let html = '<div class="dictation-cloze-panel">';
         clozeData.forEach((sentence) => {
             sentence.forEach((item) => {
                 if (item.is_blank) {
@@ -1944,6 +1968,8 @@ async function processAIFile() {
     status.innerText = "Đang xử lý AI (Whisper)...";
     tabState.aiData = { transcript: "", audioB64: "" };
     document.getElementById('feedback-container').classList.add('hidden');
+    document.getElementById('translation-section').classList.add('hidden');
+    document.getElementById('translation-box').classList.add('hidden');
     
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
@@ -1954,13 +1980,23 @@ async function processAIFile() {
         if (!transcript) throw new Error("Whisper chưa nghe ra transcript. Hãy thử file audio rõ hơn hoặc ngắn hơn.");
         tabState.aiData = {
             transcript,
-            audioB64: data.audio_b64 || ""
+            audioB64: data.audio_b64 || "",
+            translation: data.translation || ""
         };
         
         document.getElementById('audio-container').innerHTML = `
-            <audio controls class="w-full">
+            <audio controls class="dictation-native-audio">
                 <source src="data:${data.audio_mime || 'audio/mpeg'};base64,${tabState.aiData.audioB64}" type="${data.audio_mime || 'audio/mpeg'}">
             </audio>`;
+        setDictationHeader({
+            title: 'AI Dictation',
+            badge: 'Sẵn sàng',
+            subtitle: 'AI đã nghe ra transcript. Hãy nghe lại audio và chép nội dung vào khung bên dưới.'
+        });
+        if (data.translation) {
+            document.getElementById('translation-box').innerText = data.translation;
+            document.getElementById('translation-section').classList.remove('hidden');
+        }
         
         status.innerText = "Xử lý thành công! Hãy bắt đầu nghe chép.";
         renderInputArea(2, []);
@@ -1977,6 +2013,8 @@ async function processYouTube() {
     status.innerText = "Đang tải dữ liệu từ YouTube...";
     tabState.aiData = { transcript: "", audioB64: "" };
     document.getElementById('feedback-container').classList.add('hidden');
+    document.getElementById('translation-section').classList.add('hidden');
+    document.getElementById('translation-box').classList.add('hidden');
     
     try {
         const data = await API.processYouTube(url);
@@ -1984,13 +2022,23 @@ async function processYouTube() {
         if (!transcript) throw new Error("Whisper chưa nghe ra transcript. Hãy thử video/audio rõ hơn hoặc ngắn hơn.");
         tabState.aiData = {
             transcript,
-            audioB64: data.audio_b64 || ""
+            audioB64: data.audio_b64 || "",
+            translation: data.translation || ""
         };
         
         document.getElementById('audio-container').innerHTML = `
-            <audio controls class="w-full">
+            <audio controls class="dictation-native-audio">
                 <source src="data:${data.audio_mime || 'audio/mpeg'};base64,${tabState.aiData.audioB64}" type="${data.audio_mime || 'audio/mpeg'}">
             </audio>`;
+        setDictationHeader({
+            title: 'AI Dictation',
+            badge: 'Sẵn sàng',
+            subtitle: 'AI đã nghe ra transcript. Hãy nghe lại audio và chép nội dung vào khung bên dưới.'
+        });
+        if (data.translation) {
+            document.getElementById('translation-box').innerText = data.translation;
+            document.getElementById('translation-section').classList.remove('hidden');
+        }
             
         status.innerText = "Sẵn sàng!";
         renderInputArea(2, []);
@@ -2017,6 +2065,44 @@ function scrollToSection(sectionId) {
     const target = document.getElementById(sectionId);
     if (!target) return;
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function initSpeakingContextTools() {
+    const input = document.getElementById('speaking-context-input');
+    if (!input) return;
+
+    const updateCount = () => {
+        const count = document.getElementById('speaking-context-count');
+        if (count) count.innerText = `${input.value.length}/500`;
+    };
+
+    input.addEventListener('input', updateCount);
+    updateCount();
+}
+
+function selectSpeakingTopic(button, title, prompt) {
+    const input = document.getElementById('speaking-context-input');
+    const count = document.getElementById('speaking-context-count');
+
+    if (input) {
+        input.value = prompt || '';
+        input.focus();
+        if (count) count.innerText = `${input.value.length}/500`;
+    }
+
+    document.querySelectorAll('.speaking-topic-card').forEach(card => {
+        card.classList.remove('is-active');
+    });
+
+    if (button?.classList?.contains('speaking-topic-card')) {
+        button.classList.add('is-active');
+    } else if (title) {
+        const matchingCard = Array.from(document.querySelectorAll('.speaking-topic-card')).find(card => card.innerText.includes(title));
+        matchingCard?.classList.add('is-active');
+    }
+
+    const label = document.getElementById('speaking-current-topic');
+    if (label && title) label.innerText = title;
 }
 
 function setSideNavActive(buttons, activeButton, activeClasses) {
@@ -2195,6 +2281,7 @@ window.addEventListener('popstate', () => {
 });
 
 AuthUI.init();
+initSpeakingContextTools();
 
 async function loadUserLessonList() {
     const beginnerContainer = document.getElementById('content-beginner');
@@ -2215,23 +2302,26 @@ async function loadUserLessonList() {
                 ? 'assets/img_1.jpg'
                 : (lessonNumber === 2 ? 'assets/img_2.jpg' : '');
             const theme = {
-                beginner: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: 'fa-seedling', iconColor: 'text-green-500', play: 'text-green-700' },
-                intermediate: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', icon: 'fa-headphones-simple', iconColor: 'text-blue-500', play: 'text-blue-700' }
-            }[category] || { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: 'fa-seedling', iconColor: 'text-green-500', play: 'text-green-700' };
+                beginner: { modifier: 'beginner', icon: 'fa-seedling', level: 'Sơ cấp' },
+                intermediate: { modifier: 'intermediate', icon: 'fa-headphones-simple', level: 'Trung cấp' }
+            }[category] || { modifier: 'beginner', icon: 'fa-seedling', level: 'Sơ cấp' };
             const thumbnail = lessonImage
-                ? `<img src="${lessonImage}" alt="${escapeHtml(l.title)}" class="w-full h-full object-cover">`
+                ? `<img src="${lessonImage}" alt="${escapeHtml(l.title)}" class="dictation-lesson-thumb-img">`
                 : `<i class="fa-solid ${theme.icon}"></i>`;
 
             const btnHtml = `
                 <button onclick="loadDefaultData(${l.id})" 
-                    class="w-full ${theme.bg} border ${theme.border} ${theme.text} p-2 rounded-xl text-sm md:text-base font-bold hover:opacity-80 transition flex justify-between items-center text-left mb-4 shadow-sm cursor-pointer">
-                    <div class="flex items-center space-x-3 md:space-x-4">
-                        <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-lg border ${theme.border} shadow-sm flex items-center justify-center ${theme.iconColor} overflow-hidden">
+                    class="dictation-lesson-btn ${theme.modifier} cursor-pointer">
+                    <div class="dictation-lesson-left">
+                        <div class="dictation-lesson-thumb">
                             ${thumbnail}
                         </div>
-                        <span>${l.title}</span>
+                        <div class="min-w-0">
+                            <span>${escapeHtml(l.title)}</span>
+                            <small>${theme.level}</small>
+                        </div>
                     </div>
-                    <i class="fa-solid fa-play mr-2 ${theme.play}"></i>
+                    <i class="fa-solid fa-play"></i>
                 </button>`;
 
             if (category === 'intermediate') intermediateContainer.insertAdjacentHTML('beforeend', btnHtml);

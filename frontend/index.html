@@ -20,7 +20,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="css/style.css?v=20260613-19">
+    <link rel="stylesheet" href="css/style.css?v=20260613-21">
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -601,133 +601,267 @@
         </div>
     </div>
 
-    <div id="view-dictation" class="hidden min-h-screen py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button onclick="returnToLearningSpace()" class="mb-6 text-gray-500 hover:text-hanred-600 flex items-center font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 w-max cursor-pointer">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Trở lại
-            </button>
-            
-            <div class="flex space-x-4 mb-6">
-                <button onclick="switchDictationTab('default')" id="btn-tab-default" class="px-6 py-2 bg-hanred-600 text-white font-bold rounded-lg shadow transition cursor-pointer">Bài học hệ thống</button>
-                <button onclick="switchDictationTab('ai')" id="btn-tab-ai" class="px-6 py-2 bg-white text-gray-600 font-bold rounded-lg border border-gray-200 hover:bg-gray-50 transition cursor-pointer">AI Dictation</button>
+    <div id="view-dictation" class="hidden min-h-screen py-10 dictation-page">
+        <div class="dictation-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="dictation-topbar motion-card">
+                <button onclick="returnToLearningSpace()" class="dictation-back-btn cursor-pointer">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Trở lại</span>
+                </button>
+
+                <div class="dictation-mode-tabs" aria-label="Chọn chế độ dictation">
+                    <button onclick="switchDictationTab('default')" id="btn-tab-default" class="dictation-tab is-active cursor-pointer">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Bài học hệ thống</span>
+                    </button>
+                    <button onclick="switchDictationTab('ai')" id="btn-tab-ai" class="dictation-tab cursor-pointer">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>AI Dictation</span>
+                    </button>
+                </div>
             </div>
 
-                    <div class="grid lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-1 space-y-4 motion-left">
-                            <div id="panel-default-control" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-max">
-                                <h3 class="font-bold text-lg mb-4 text-gray-900 border-b pb-2">Danh sách bài học</h3>
-                                <div class="mb-2">
-                                    <button onclick="toggleLevel('content-beginner')" class="w-full flex justify-between items-center py-2 text-hanred-600 font-bold text-sm italic hover:bg-red-50 rounded px-2 transition cursor-pointer">
-                                        <span><i class="fa-solid fa-seedling mr-2"></i> Sơ Cấp</span>
-                                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                                    </button>
-                                    <div id="content-beginner" class="level-content active space-y-4 mt-3"></div>
-                                </div>
-                                <div class="mb-2 border-t pt-2">
-                                    <button onclick="toggleLevel('content-intermediate')" class="w-full flex justify-between items-center py-2 text-blue-600 font-bold text-sm italic hover:bg-blue-50 rounded px-2 transition cursor-pointer">
-                                        <span><i class="fa-solid fa-headphones-simple mr-2"></i> Trung cấp</span>
-                                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                                    </button>
-                                    <div id="content-intermediate" class="level-content active space-y-4 mt-3"></div>
-                                </div>
-                            </div>
-
-                    <div id="panel-ai-control" class="hidden">
-                        <h3 class="font-bold text-lg mb-4 text-gray-900 border-b pb-2">Tạo bài học AI</h3>
-                        <div class="mb-4 space-y-3">
-                            <div class="border border-gray-200 p-3 rounded-xl bg-gray-50">
-                                <label class="block text-xs font-bold text-gray-700 mb-2">Cách 1: Tải file từ máy</label>
-                                <input type="file" id="ai-file-input" accept="audio/*,video/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-hanred-700 hover:file:bg-red-100 cursor-pointer"/>
-                                <button onclick="processAIFile()" id="btn-process-ai" class="mt-2 w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition cursor-pointer">
-                                    Phân tích File
-                                </button>
-                            </div>
-
-                            <div class="border border-gray-200 p-3 rounded-xl bg-gray-50">
-                                <label class="block text-xs font-bold text-gray-700 mb-2">Cách 2: Dán link YouTube</label>
-                                <input type="text" id="youtube-input" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2 border border-gray-300 rounded-lg text-sm mb-2 outline-none focus:border-hanred-500">
-                                <button onclick="processYouTube()" id="btn-process-yt" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex justify-center items-center cursor-pointer">
-                                    <i class="fa-brands fa-youtube mr-2 text-lg"></i> Phân tích YouTube
-                                </button>
+            <div class="dictation-layout grid lg:grid-cols-[340px_minmax(0,1fr)] gap-6">
+                <div class="dictation-sidebar space-y-4 motion-left">
+                    <div id="panel-default-control" class="dictation-side-panel bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-max">
+                        <div class="dictation-cheer-card">
+                            <img src="assets/img_12.png" alt="" aria-hidden="true">
+                            <div>
+                                <b>Cố lên nhé!</b>
+                                <span>Nghe chậm, chép chắc từng câu.</span>
                             </div>
                         </div>
-                        <p id="ai-status" class="text-sm text-gray-500 mb-4 text-center font-medium"></p>
+
+                        <h3 class="dictation-side-title">Danh sách bài học</h3>
+                        <div class="dictation-level-block">
+                            <button onclick="toggleLevel('content-beginner')" class="dictation-level-toggle cursor-pointer">
+                                <span><i class="fa-solid fa-seedling"></i> Sơ cấp</span>
+                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="content-beginner" class="level-content active dictation-lesson-list"></div>
+                        </div>
+                        <div class="dictation-level-block">
+                            <button onclick="toggleLevel('content-intermediate')" class="dictation-level-toggle is-blue cursor-pointer">
+                                <span><i class="fa-solid fa-headphones-simple"></i> Trung cấp</span>
+                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="content-intermediate" class="level-content active dictation-lesson-list"></div>
+                        </div>
+                    </div>
+
+                    <div id="panel-ai-control" class="hidden dictation-side-panel bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-max">
+                        <div class="dictation-cheer-card ai-card">
+                            <img src="assets/img_9.png" alt="" aria-hidden="true">
+                            <div>
+                                <b>Tạo bài học AI</b>
+                                <span>Tải audio/video hoặc dùng link YouTube.</span>
+                            </div>
+                        </div>
+
+                        <h3 class="dictation-side-title">Nguồn bài nghe</h3>
+                        <div class="dictation-ai-source">
+                            <label class="dictation-source-label">Tải file từ máy</label>
+                            <input type="file" id="ai-file-input" accept="audio/*,video/*" class="dictation-file-input cursor-pointer"/>
+                            <button onclick="processAIFile()" id="btn-process-ai" class="dictation-source-btn cursor-pointer">
+                                <i class="fa-solid fa-file-audio"></i>
+                                Phân tích file
+                            </button>
+                        </div>
+
+                        <div class="dictation-ai-source">
+                            <label class="dictation-source-label">Dán link YouTube</label>
+                            <input type="text" id="youtube-input" placeholder="https://www.youtube.com/watch?v=..." class="dictation-url-input outline-none">
+                            <button onclick="processYouTube()" id="btn-process-yt" class="dictation-source-btn youtube cursor-pointer">
+                                <i class="fa-brands fa-youtube"></i>
+                                Phân tích YouTube
+                            </button>
+                        </div>
+                        <p id="ai-status" class="dictation-ai-status"></p>
                     </div>
                 </div>
 
-                <div class="lg:col-span-2 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-200 flex flex-col motion-right">
-                    <h3 class="font-bold text-xl text-gray-900 mb-6">2. Khu vực chép chính tả</h3>
-
-                    <div id="audio-container" class="mb-6">
-                        <audio controls style="width: 100%; border-radius: 8px; outline: none;" src=""></audio>
+                <div class="dictation-main-card bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col motion-right">
+                    <div class="dictation-lesson-hero">
+                        <div class="min-w-0">
+                            <div class="dictation-title-row">
+                                <h2 id="dictation-lesson-title">Bài 1 • Sở thích</h2>
+                                <span id="dictation-lesson-badge">Sơ cấp</span>
+                            </div>
+                            <p id="dictation-lesson-subtitle">Nghe thật kỹ và chép lại nội dung bạn nghe được.</p>
+                        </div>
+                        <img src="assets/img_11.png" alt="" aria-hidden="true">
                     </div>
 
-                    <div id="input-area-container" class="mb-6">
-                        </div>
+                    <div class="dictation-divider"></div>
 
-                    <div class="flex justify-end">
-                        <button onclick="submitEval()" class="bg-gray-900 hover:bg-black text-white px-8 py-2.5 rounded-lg font-medium transition shadow-md cursor-pointer">Chấm điểm bài làm</button>
+                    <section class="dictation-work-section">
+                        <h3>1. Nghe đoạn hội thoại</h3>
+                        <div class="dictation-audio-card">
+                            <div class="dictation-audio-deco" aria-hidden="true">
+                                <span></span><span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                            <div id="audio-container" class="dictation-audio-slot">
+                                <audio controls class="dictation-native-audio" src=""></audio>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="dictation-work-section dictation-writing-section">
+                        <h3>2. Khu vực chép chính tả</h3>
+                        <div id="input-area-container" class="dictation-input-slot"></div>
+                    </section>
+
+                    <div class="dictation-action-row">
+                        <button onclick="submitEval()" class="dictation-submit-btn cursor-pointer">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Chấm điểm bài làm
+                        </button>
                     </div>
 
                     <div id="feedback-container" class="mt-8 hidden animate-in fade-in duration-500"></div>
 
-                    <div id="translation-section" class="mt-6 hidden border-t pt-4">
-                        <button onclick="toggleTranslation()" class="flex items-center text-hanred-600 font-bold hover:text-hanred-700 transition cursor-pointer">
-                            <i class="fa-solid fa-circle-info mr-2"></i> Xem bản dịch tiếng Việt
+                    <div id="translation-section" class="dictation-translation hidden">
+                        <button onclick="toggleTranslation()" class="dictation-translation-btn cursor-pointer">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Xem bản dịch tiếng Việt
                         </button>
-                        <div id="translation-box" class="mt-3 p-4 bg-red-50 rounded-xl text-gray-700 italic leading-relaxed hidden"></div>
+                        <div id="translation-box" class="dictation-translation-box hidden"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="view-speaking" class="hidden min-h-screen py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button onclick="returnToLearningSpace()" class="mb-6 text-gray-500 hover:text-hanred-600 flex items-center font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 w-max cursor-pointer">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Trở lại
-            </button>
-
-            <div class="grid lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-max motion-left">
-                    <h3 class="font-bold text-lg mb-2 text-gray-900">1. Cung cấp ngữ cảnh</h3>
-                    <p class="text-sm text-gray-500 mb-6">Tải lên file văn bản hoặc nhập kịch bản để AI dựa vào đó giao tiếp với bạn (Tùy chọn).</p>
-                    
-                    <textarea class="w-full h-32 p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-hanred-500 resize-none text-sm mb-4 transition" placeholder="Ví dụ: Đóng vai nhân viên quán cafe ở Seoul, hãy hỏi tôi muốn gọi món gì..."></textarea>
-                    
-                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-hanred-500 hover:bg-red-50 transition cursor-pointer bg-white group">
-                        <i class="fa-solid fa-file-lines text-2xl text-gray-400 mb-2 group-hover:text-hanred-500 transition"></i>
-                        <p class="text-sm text-gray-600 font-medium">Kéo thả file PDF/DOCX</p>
-                    </div>
-                    
-                    <button class="w-full mt-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 rounded-lg transition text-sm cursor-pointer">
-                        Lưu ngữ cảnh & Bắt đầu
+    <div id="view-speaking" class="hidden min-h-screen py-10 speaking-page">
+        <div class="speaking-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="speaking-layout grid lg:grid-cols-[340px_minmax(0,1fr)] gap-6">
+                <aside class="speaking-side motion-left">
+                    <button onclick="returnToLearningSpace()" class="speaking-back-btn cursor-pointer">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Trở lại</span>
                     </button>
-                </div>
 
-                <div class="lg:col-span-2 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[500px] motion-right">
-                    <div class="absolute top-8 right-8 flex items-center space-x-2 bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span>AI Đang sẵn sàng</span>
+                    <section class="speaking-context-card">
+                        <div class="speaking-card-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <h3>1. Cung cấp ngữ cảnh</h3>
+                        <p>Tự chọn một chủ đề bên dưới hoặc nhập tình huống riêng để AI luyện nói cùng bạn.</p>
+
+                        <textarea id="speaking-context-input" class="speaking-context-input outline-none" maxlength="500" placeholder="Ví dụ: Đóng vai nhân viên quán cafe ở Seoul, hãy hỏi tôi muốn gọi món gì..."></textarea>
+                        <div class="speaking-count-row">
+                            <span>Gợi ý: viết ngắn, rõ vai trò.</span>
+                            <span id="speaking-context-count">0/500</span>
+                        </div>
+
+                        <label class="speaking-upload-zone cursor-pointer">
+                            <input type="file" class="hidden" accept=".pdf,.doc,.docx,.txt">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <span>Kéo thả file PDF/DOCX tại đây</span>
+                            <b>hoặc click để chọn file</b>
+                        </label>
+
+                        <button class="speaking-save-btn cursor-pointer">
+                            <span>Lưu ngữ cảnh & Bắt đầu</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </section>
+
+                    <section class="speaking-scenarios-card">
+                        <div class="speaking-section-label">Chủ đề luyện nhanh</div>
+                        <div class="speaking-topic-list">
+                            <button type="button" onclick="selectSpeakingTopic(this, 'Luyện gọi món', 'Đóng vai nhân viên quán cafe ở Seoul. Hãy chào tôi, hỏi tôi muốn gọi món gì, gợi ý một đồ uống và hỏi thêm kích cỡ.')" class="speaking-topic-card is-active cursor-pointer">
+                                <span class="topic-icon cafe"><i class="fa-solid fa-mug-saucer"></i></span>
+                                <span><b>Luyện gọi món</b><small>Quán cafe, nhà hàng</small></span>
+                            </button>
+                            <button type="button" onclick="selectSpeakingTopic(this, 'Luyện chào hỏi', 'Đóng vai một người bạn Hàn Quốc mới gặp. Hãy chào hỏi, hỏi tên, quê quán, sở thích và phản hồi tự nhiên.')" class="speaking-topic-card cursor-pointer">
+                                <span class="topic-icon hello"><i class="fa-solid fa-hand-sparkles"></i></span>
+                                <span><b>Luyện chào hỏi</b><small>Làm quen tự nhiên</small></span>
+                            </button>
+                            <button type="button" onclick="selectSpeakingTopic(this, 'Hỏi đường ở Seoul', 'Đóng vai người dân Seoul. Tôi sẽ hỏi đường đến ga tàu hoặc địa điểm du lịch, hãy chỉ đường bằng tiếng Hàn dễ hiểu.')" class="speaking-topic-card cursor-pointer">
+                                <span class="topic-icon map"><i class="fa-solid fa-map-location-dot"></i></span>
+                                <span><b>Hỏi đường ở Seoul</b><small>Tàu điện, địa điểm</small></span>
+                            </button>
+                            <button type="button" onclick="selectSpeakingTopic(this, 'Mua sắm', 'Đóng vai nhân viên cửa hàng. Hãy hỏi tôi cần mua gì, màu sắc, kích cỡ, giá tiền và cách thanh toán.')" class="speaking-topic-card cursor-pointer">
+                                <span class="topic-icon shop"><i class="fa-solid fa-bag-shopping"></i></span>
+                                <span><b>Mua sắm</b><small>Hỏi giá, chọn đồ</small></span>
+                            </button>
+                            <button type="button" onclick="selectSpeakingTopic(this, 'Phỏng vấn ngắn', 'Đóng vai người phỏng vấn. Hãy hỏi tôi về bản thân, lý do học tiếng Hàn, điểm mạnh và kế hoạch sắp tới.')" class="speaking-topic-card cursor-pointer">
+                                <span class="topic-icon talk"><i class="fa-solid fa-comments"></i></span>
+                                <span><b>Phỏng vấn ngắn</b><small>Giới thiệu bản thân</small></span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <div class="speaking-side-mascot" aria-hidden="true">
+                        <img src="assets/img_11.png" alt="">
+                    </div>
+                </aside>
+
+                <main class="speaking-main-card motion-right">
+                    <div class="speaking-ready-pill">
+                        <span></span>
+                        <b>AI đang sẵn sàng</b>
+                        <img src="assets/img_9.png" alt="" aria-hidden="true">
                     </div>
 
-                    <div class="flex space-x-1.5 opacity-60 mb-8 mt-4">
-                        <div class="w-2 h-6 bg-hanred-300 rounded-full animate-pulse"></div>
-                        <div class="w-2 h-10 bg-hanred-400 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
-                        <div class="w-2 h-16 bg-hanred-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-                        <div class="w-2 h-8 bg-hanred-400 rounded-full animate-pulse" style="animation-delay: 0.3s"></div>
-                        <div class="w-2 h-4 bg-hanred-300 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                    <div class="speaking-heart-bubble" aria-hidden="true">
+                        <i class="fa-solid fa-heart"></i>
                     </div>
 
-                    <h3 class="font-extrabold text-3xl text-gray-900 mb-3">Xin chào! Tôi là HanLinguaAI.</h3>
-                    <p class="text-gray-500 mb-12 max-w-md text-lg">Nhấn vào biểu tượng Micro bên dưới để bắt đầu nói. Tôi sẽ lắng nghe và phản hồi lại bạn bằng tiếng Hàn.</p>
-                    
-                    <button class="pulse-mic w-28 h-28 bg-hanred-600 rounded-full flex items-center justify-center text-white text-4xl hover:bg-hanred-700 transition shadow-xl relative z-10 cursor-pointer">
-                        <i class="fa-solid fa-microphone"></i>
-                    </button>
-                    
-                    <p class="mt-10 text-sm font-bold text-gray-400">Đang chờ bạn nhấn...</p>
-                </div>
+                    <div class="speaking-center">
+                        <h2>Xin chào! Tôi là <span>HanLinguaAI.</span></h2>
+                        <p>Nhấn vào biểu tượng Micro bên dưới để bắt đầu nói. Tôi sẽ lắng nghe và phản hồi lại bạn bằng tiếng Hàn.</p>
+
+                        <div class="speaking-mic-stage">
+                            <div class="speaking-wave speaking-wave-left" aria-hidden="true">
+                                <span></span><span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                            <button class="pulse-mic speaking-mic-btn cursor-pointer" aria-label="Bắt đầu luyện nói">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                            <div class="speaking-wave speaking-wave-right" aria-hidden="true">
+                                <span></span><span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="speaking-tap-hint">
+                            <i class="fa-solid fa-arrow-turn-up"></i>
+                            <span>Nhấn để bắt đầu nói!</span>
+                        </div>
+                    </div>
+
+                    <section class="speaking-today-panel">
+                        <div class="speaking-today-title">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Hôm nay bạn sẽ luyện</span>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div class="speaking-practice-grid">
+                            <button type="button" onclick="selectSpeakingTopic(null, 'Luyện gọi món', 'Đóng vai nhân viên quán cafe ở Seoul. Hãy chào tôi, hỏi tôi muốn gọi món gì, gợi ý một đồ uống và hỏi thêm kích cỡ.')" class="speaking-practice-card orange cursor-pointer">
+                                <img src="assets/img_12.png" alt="" aria-hidden="true">
+                                <small>Chủ đề 1</small>
+                                <b>Luyện gọi món</b>
+                                <span>Quán cafe ở Seoul</span>
+                            </button>
+                            <button type="button" onclick="selectSpeakingTopic(null, 'Luyện chào hỏi', 'Đóng vai một người bạn Hàn Quốc mới gặp. Hãy chào hỏi, hỏi tên, quê quán, sở thích và phản hồi tự nhiên.')" class="speaking-practice-card purple cursor-pointer">
+                                <img src="assets/img_10.png" alt="" aria-hidden="true">
+                                <small>Chủ đề 2</small>
+                                <b>Luyện chào hỏi</b>
+                                <span>Làm quen tự nhiên</span>
+                            </button>
+                            <button type="button" onclick="selectSpeakingTopic(null, 'Hỏi đường ở Seoul', 'Đóng vai người dân Seoul. Tôi sẽ hỏi đường đến ga tàu hoặc địa điểm du lịch, hãy chỉ đường bằng tiếng Hàn dễ hiểu.')" class="speaking-practice-card green cursor-pointer">
+                                <img src="assets/img_11.png" alt="" aria-hidden="true">
+                                <small>Chủ đề 3</small>
+                                <b>Hỏi đường</b>
+                                <span>Tàu điện, địa điểm</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <img src="assets/img_9.png" alt="" class="speaking-corner-mascot" aria-hidden="true">
+                </main>
             </div>
         </div>
     </div>
@@ -1385,7 +1519,7 @@
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260601-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260613-19"></script>
+    <script src="js/main.js?v=20260613-21"></script>
 
     <script>
         window.onload = () => { 
