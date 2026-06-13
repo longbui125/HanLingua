@@ -2650,3 +2650,591 @@ body.dark-mode #view-profile #learning-sidebar button.sidebar-label {
     border-color: rgba(148, 163, 184, 0.5) !important;
     color: #e5edf8 !important;
 }
+
+/* Student overview redesign */
+#user-overview-section.edu-friendly-panel {
+    border: 0 !important;
+    background:
+        radial-gradient(circle at 10% 4%, rgba(255, 196, 202, 0.34), transparent 22rem),
+        radial-gradient(circle at 86% 8%, rgba(191, 219, 254, 0.32), transparent 24rem),
+        linear-gradient(180deg, #fffaf6 0%, #fffdfb 42%, #f8fbff 100%) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+#user-overview-section .overview-learning-stack > .overview-welcome,
+#daily-media-legacy {
+    display: none !important;
+}
+
+#user-overview-section #user-progress-summary {
+    display: block;
+    max-width: none;
+    margin: 0;
+}
+
+.student-overview-shell {
+    position: relative;
+    min-height: calc(100vh - 132px);
+    padding: clamp(1rem, 2.2vw, 1.6rem);
+    overflow: hidden;
+}
+
+.student-overview-shell::before,
+.student-overview-shell::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.student-overview-shell::before {
+    inset: 0;
+    background-image:
+        radial-gradient(circle, rgba(248, 113, 113, 0.14) 1.2px, transparent 1.6px),
+        linear-gradient(120deg, rgba(248, 113, 113, 0.045) 0 1px, transparent 1px 36px);
+    background-size: 34px 34px, 220px 220px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 72%);
+}
+
+.student-overview-shell::after {
+    right: 4vw;
+    top: 72px;
+    width: 130px;
+    height: 42px;
+    border-top: 3px solid rgba(248, 113, 113, 0.18);
+    border-bottom: 3px solid rgba(96, 165, 250, 0.14);
+    transform: rotate(-7deg);
+    animation: hanSketchFloat 10s ease-in-out infinite;
+}
+
+.student-overview-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+}
+
+.student-main-stack,
+.student-side-stack {
+    display: grid;
+    gap: clamp(1rem, 1.8vw, 1.35rem);
+}
+
+.student-hero-card,
+.learning-panel,
+.learning-side-card,
+.quest-board {
+    border-radius: 12px !important;
+    border: 1px solid rgba(254, 205, 211, 0.72) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 18px 48px rgba(148, 72, 72, 0.08) !important;
+}
+
+.student-hero-card {
+    position: relative;
+    overflow: hidden;
+    min-height: clamp(250px, 24vw, 350px);
+}
+
+.student-hero-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: clamp(250px, 24vw, 350px);
+    object-fit: cover;
+    object-position: center;
+}
+
+.student-hero-note {
+    position: absolute;
+    left: clamp(1rem, 2.2vw, 1.6rem);
+    bottom: clamp(1rem, 2vw, 1.4rem);
+    max-width: min(470px, 70%);
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+}
+
+.student-date-pill,
+.learning-day-label {
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+    border-radius: 999px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #ea580c;
+    font-size: 0.74rem;
+    font-weight: 900;
+    padding: 0.28rem 0.65rem;
+}
+
+.student-hero-note p {
+    margin-top: 0.45rem;
+    color: #334155;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.learning-panel,
+.learning-side-card {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1rem, 2vw, 1.25rem);
+}
+
+.learning-card-head {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.learning-eyebrow {
+    color: #111827;
+    font-size: 0.78rem;
+    font-weight: 950;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.learning-muted {
+    color: #64748b;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-top: 0.35rem;
+}
+
+.learning-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 900;
+    white-space: nowrap;
+    transition: color 180ms ease, transform 180ms ease;
+}
+
+.learning-link-btn:hover {
+    color: #e53935;
+    transform: translateX(2px);
+}
+
+.quick-practice-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.quick-practice-card {
+    position: relative;
+    min-height: 136px;
+    overflow: hidden;
+    text-align: left;
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    padding: 1rem;
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.quick-practice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.09);
+}
+
+.quick-practice-card h4 {
+    position: relative;
+    z-index: 2;
+    color: #111827;
+    font-size: 0.95rem;
+    font-weight: 950;
+    margin-bottom: 0.45rem;
+}
+
+.quick-practice-card p {
+    position: relative;
+    z-index: 2;
+    max-width: 72%;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.quick-practice-card span {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: 0.85rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 34px;
+    padding: 0 0.75rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.78);
+    color: #111827;
+    font-size: 0.78rem;
+    font-weight: 950;
+}
+
+.quick-practice-card img {
+    position: absolute;
+    right: -0.4rem;
+    bottom: 2.2rem;
+    width: 86px;
+    height: 86px;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.12));
+    animation: hanMascotFloat 5.8s ease-in-out infinite;
+}
+
+.quick-orange {
+    background: linear-gradient(135deg, #fff7ed, #fff1e7) !important;
+    border-color: #fed7aa;
+}
+
+.quick-purple {
+    background: linear-gradient(135deg, #faf5ff, #f3e8ff) !important;
+    border-color: #ddd6fe;
+}
+
+.quick-green {
+    background: linear-gradient(135deg, #f0fdf4, #e9fff4) !important;
+    border-color: #bbf7d0;
+}
+
+.quick-blue {
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe) !important;
+    border-color: #bfdbfe;
+}
+
+.progress-snapshot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0 -1rem -1rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.92);
+}
+
+.progress-snapshot-item {
+    min-height: 112px;
+    padding: 1rem;
+    border-right: 1px solid rgba(226, 232, 240, 0.92);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.92);
+}
+
+.progress-snapshot-item:nth-child(2n) {
+    border-right: 0;
+}
+
+.progress-snapshot-item strong {
+    display: block;
+    margin-top: 0.55rem;
+    color: #111827;
+    font-size: clamp(1.55rem, 2.4vw, 2.1rem);
+    font-weight: 950;
+    line-height: 1;
+}
+
+.progress-snapshot-item span {
+    display: block;
+    margin-top: 0.5rem;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.progress-mascot,
+.vocab-mascot,
+.streak-mascot {
+    position: absolute;
+    pointer-events: none;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 22px rgba(15, 23, 42, 0.11));
+    animation: hanMascotFloat 6.4s ease-in-out infinite;
+}
+
+.progress-mascot {
+    right: -0.8rem;
+    bottom: -1rem;
+    width: 112px;
+}
+
+.vocab-today-card {
+    min-height: 230px;
+    background:
+        radial-gradient(circle at 70% 28%, rgba(250, 204, 21, 0.14), transparent 11rem),
+        rgba(255, 255, 255, 0.92) !important;
+}
+
+.vocab-today-count {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.vocab-today-count strong {
+    color: #14532d;
+    font-size: 1.25rem;
+    font-weight: 950;
+}
+
+.vocab-chip-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    padding-right: 3.8rem;
+}
+
+.vocab-chip {
+    min-height: 58px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.88);
+    padding: 0.55rem;
+    text-align: left;
+    transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.vocab-chip:hover {
+    transform: translateY(-3px);
+    border-color: #fb7185;
+}
+
+.vocab-chip b,
+.vocab-chip small,
+.vocab-chip span {
+    display: block;
+}
+
+.vocab-chip b {
+    color: #111827;
+    font-size: 0.78rem;
+    font-weight: 950;
+}
+
+.vocab-chip small,
+.vocab-chip span {
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.vocab-mascot {
+    right: -0.6rem;
+    bottom: -1.4rem;
+    width: 110px;
+}
+
+.streak-week-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.45rem;
+}
+
+.streak-day {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 850;
+}
+
+.streak-day b {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+.streak-day.is-active b {
+    background: linear-gradient(135deg, #fecdd3, #fb7185);
+    color: #fff;
+}
+
+.streak-day small {
+    color: #64748b;
+}
+
+.streak-mascot {
+    right: -0.4rem;
+    bottom: -1.8rem;
+    width: 92px;
+    opacity: 0.78;
+}
+
+.daily-listening-card:empty {
+    display: none;
+}
+
+.daily-listening-card {
+    background: linear-gradient(135deg, #fff7ed, #fff) !important;
+}
+
+.student-overview-shell .quest-board {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 237, 0.86)),
+        radial-gradient(circle at 88% 20%, rgba(251, 113, 133, 0.12), transparent 16rem) !important;
+}
+
+.student-overview-shell .quest-board::before {
+    content: "Kế hoạch học hôm nay";
+    display: block;
+    color: #111827;
+    font-size: 0.82rem;
+    font-weight: 950;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin-bottom: 0.95rem;
+}
+
+.student-overview-shell .quest-board::after {
+    opacity: 0.45;
+}
+
+.student-overview-shell .mission-strip {
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem !important;
+}
+
+.student-overview-shell .quest-card {
+    grid-template-columns: minmax(0, 1fr) minmax(126px, 160px) !important;
+    align-items: center;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.82) !important;
+}
+
+.student-overview-shell .quest-card:nth-child(odd) {
+    transform: none !important;
+}
+
+.student-overview-shell .quest-card > button {
+    margin-top: 0 !important;
+}
+
+@keyframes hanMascotFloat {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+    50% { transform: translate3d(0, -8px, 0) rotate(2deg); }
+}
+
+@media (max-width: 1280px) {
+    .student-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-side-stack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .quick-practice-grid,
+    .student-side-stack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .student-overview-shell {
+        padding: 0.85rem;
+    }
+
+    .quick-practice-grid,
+    .student-side-stack,
+    .progress-snapshot-grid,
+    .student-overview-shell .quest-card {
+        grid-template-columns: 1fr !important;
+    }
+
+    .student-hero-note {
+        position: static;
+        max-width: none;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+    }
+
+    .student-hero-image {
+        min-height: 220px;
+    }
+
+    .vocab-chip-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-right: 0;
+    }
+
+    .vocab-mascot,
+    .progress-mascot,
+    .streak-mascot {
+        opacity: 0.28;
+    }
+}
+
+body.dark-mode #user-overview-section.edu-friendly-panel {
+    background:
+        radial-gradient(circle at 10% 4%, rgba(248, 113, 113, 0.13), transparent 22rem),
+        radial-gradient(circle at 86% 8%, rgba(96, 165, 250, 0.15), transparent 24rem),
+        linear-gradient(180deg, #111827 0%, #172033 48%, #0f172a 100%) !important;
+}
+
+body.dark-mode .student-hero-card,
+body.dark-mode .learning-panel,
+body.dark-mode .learning-side-card,
+body.dark-mode .student-overview-shell .quest-board,
+body.dark-mode .student-overview-shell .quest-card,
+body.dark-mode .quick-practice-card,
+body.dark-mode .vocab-chip,
+body.dark-mode .student-hero-note {
+    background: #111827 !important;
+    border-color: rgba(148, 163, 184, 0.42) !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .learning-eyebrow,
+body.dark-mode .student-overview-shell .quest-board::before,
+body.dark-mode .quick-practice-card h4,
+body.dark-mode .progress-snapshot-item strong,
+body.dark-mode .vocab-chip b {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .learning-muted,
+body.dark-mode .student-hero-note p,
+body.dark-mode .quick-practice-card p,
+body.dark-mode .progress-snapshot-item span,
+body.dark-mode .vocab-chip small,
+body.dark-mode .vocab-chip span,
+body.dark-mode .streak-day small {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .quick-practice-card span,
+body.dark-mode .student-date-pill,
+body.dark-mode .learning-day-label {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(148, 163, 184, 0.42) !important;
+    color: #f8fafc !important;
+}

@@ -11,8 +11,11 @@ let currentPayment = null;
 // Authentication UI
 const AuthUI = {
     isLoginMode: true,
+    hasInitialized: false,
 
     async init() {
+        if (this.hasInitialized) return;
+        this.hasInitialized = true;
         const token = localStorage.getItem('access_token');
         if (token) {
             try {
@@ -824,8 +827,192 @@ function renderSkillPanel(data) {
         </div>`;
 }
 
+function renderOverviewProgressCard(data, badgeText = '') {
+    const learned = Number(data.total_attempts || data.dictation_completed || 0);
+    const goalPercent = Math.max(0, Math.min(100, Number(data.avg_score || 0)));
+    return `
+        <section class="learning-side-card progress-snapshot motion-right">
+            <div class="learning-card-head">
+                <div>
+                    <div class="learning-eyebrow">Tiến độ học tập</div>
+                    ${badgeText ? `<div class="learning-day-label">${escapeHtml(badgeText)}</div>` : ''}
+                </div>
+                <button onclick="switchUserPanel('user-progress-section')" class="learning-link-btn">Xem chi tiết <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <div class="progress-snapshot-grid">
+                <div class="progress-snapshot-item">
+                    <i class="fa-solid fa-fire text-orange-500"></i>
+                    <strong>${data.streak_days || 0}</strong>
+                    <span>ngày liên tiếp</span>
+                </div>
+                <div class="progress-snapshot-item">
+                    <i class="fa-solid fa-book-open text-slate-400"></i>
+                    <strong>${learned}</strong>
+                    <span>bài đã học</span>
+                </div>
+                <div class="progress-snapshot-item">
+                    <i class="fa-regular fa-clock text-slate-400"></i>
+                    <strong>${formatStudyTime(data.total_study_minutes)}</strong>
+                    <span>tổng thời gian</span>
+                </div>
+                <div class="progress-snapshot-item">
+                    <i class="fa-solid fa-bullseye text-blue-500"></i>
+                    <strong>${goalPercent}%</strong>
+                    <span>độ đúng TB</span>
+                </div>
+            </div>
+            <img src="assets/img_7.png" alt="" class="progress-mascot" aria-hidden="true">
+        </section>`;
+}
+
+function renderQuickPracticeCards() {
+    const cards = [
+        {
+            tone: 'orange',
+            title: 'AI Dictation',
+            text: 'Nghe và gõ lại đoạn hội thoại',
+            image: 'img_4.png',
+            action: "switchView('view-dictation')",
+            cta: 'Luyện nghe'
+        },
+        {
+            tone: 'purple',
+            title: 'AI Speaking',
+            text: 'Nói theo chủ đề và luyện phản xạ',
+            image: 'img_6.png',
+            action: "switchView('view-speaking')",
+            cta: 'Luyện nói'
+        },
+        {
+            tone: 'green',
+            title: 'Ôn từ vựng',
+            text: 'Học - Nhớ - Ôn lại hiệu quả',
+            image: 'img_5.png',
+            action: "switchUserPanel('user-vocabulary-section')",
+            cta: 'Ôn từ'
+        },
+        {
+            tone: 'blue',
+            title: 'Forecast',
+            text: 'Dự đoán từ vựng sắp xuất hiện',
+            image: 'img_8.png',
+            action: "switchUserPanel('user-vocabulary-section')",
+            cta: 'Xem ngay'
+        }
+    ];
+    return `
+        <section class="learning-panel quick-practice-panel motion-bottom">
+            <div class="learning-card-head">
+                <div>
+                    <div class="learning-eyebrow">Luyện tập nhanh</div>
+                    <p class="learning-muted">Chọn kỹ năng bạn muốn luyện hôm nay</p>
+                </div>
+            </div>
+            <div class="quick-practice-grid">
+                ${cards.map(card => `
+                    <button onclick="${card.action}" class="quick-practice-card quick-${card.tone} motion-pop">
+                        <div>
+                            <h4>${card.title}</h4>
+                            <p>${card.text}</p>
+                        </div>
+                        <img src="assets/${card.image}" alt="" aria-hidden="true">
+                        <span>${card.cta} <i class="fa-solid fa-arrow-right"></i></span>
+                    </button>
+                `).join('')}
+            </div>
+        </section>`;
+}
+
+function renderVocabularyTodayCard(forecast = null) {
+    const data = forecast || {};
+    const words = [
+        ['사랑', 'sarang', 'tình yêu'],
+        ['공부', 'gongbu', 'học tập'],
+        ['친구', 'chingu', 'bạn bè'],
+        ['시간', 'sigan', 'thời gian'],
+        ['오늘', 'oneul', 'hôm nay']
+    ];
+    return `
+        <section class="learning-side-card vocab-today-card motion-right">
+            <div class="learning-card-head">
+                <div>
+                    <div class="learning-eyebrow">Từ vựng hôm nay</div>
+                    <p class="learning-muted">Học 5 từ mới mỗi ngày</p>
+                </div>
+                <button onclick="switchUserPanel('user-vocabulary-section')" class="learning-link-btn">Xem tất cả <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <div class="vocab-today-count">
+                <strong>${Math.min(5, Math.max(0, Number(data.review_count || 5)))}</strong><span>/5 từ đề xuất</span>
+            </div>
+            <div class="vocab-chip-grid">
+                ${words.map(([ko, roman, vi]) => `
+                    <button onclick="switchUserPanel('user-vocabulary-section')" class="vocab-chip">
+                        <b>${ko}</b>
+                        <small>${roman}</small>
+                        <span>${vi}</span>
+                    </button>
+                `).join('')}
+            </div>
+            <img src="assets/img_5.png" alt="" class="vocab-mascot" aria-hidden="true">
+        </section>`;
+}
+
+function renderStudyStreakCard(data) {
+    const dayNumber = getCurrentPlanDay(data.learning_day || 1);
+    const labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+    const activeCount = Math.min(7, Math.max(0, Number(data.streak_days || 0)));
+    return `
+        <section class="learning-side-card streak-week-card motion-right">
+            <div class="learning-card-head">
+                <div>
+                    <div class="learning-eyebrow">Chuỗi ngày học</div>
+                    <p class="learning-muted">Giữ vững thói quen mỗi ngày</p>
+                </div>
+                <i class="fa-regular fa-calendar-check text-slate-400"></i>
+            </div>
+            <div class="streak-week-row">
+                ${labels.map((label, index) => {
+                    const number = Math.max(1, dayNumber - 6 + index);
+                    const active = index >= 7 - activeCount;
+                    return `
+                        <div class="streak-day ${active ? 'is-active' : ''}">
+                            <span>${label}</span>
+                            <b>${active ? '<i class="fa-solid fa-check"></i>' : number}</b>
+                            <small>${number}</small>
+                        </div>`;
+                }).join('')}
+            </div>
+            <img src="assets/img_6.png" alt="" class="streak-mascot" aria-hidden="true">
+        </section>`;
+}
+
+function renderLearningOverviewDashboardV4(data, forecast = null, badgeText = '') {
+    return `
+        <div class="student-overview-shell">
+            <div class="student-overview-grid">
+                <div class="student-main-stack">
+                    <section class="student-hero-card motion-left">
+                        <img src="assets/img_3.png" alt="HanLingua Korean study overview" class="student-hero-image">
+                        <div class="student-hero-note">
+                            <span id="daily-date" class="student-date-pill"></span>
+                            <p id="daily-message">Đang tải thông điệp hôm nay...</p>
+                        </div>
+                    </section>
+                    ${renderQuickPracticeCards()}
+                    ${renderDailyLearningPlan(data)}
+                </div>
+                <aside class="student-side-stack">
+                    ${renderOverviewProgressCard(data, badgeText)}
+                    ${renderVocabularyTodayCard(forecast)}
+                    ${renderStudyStreakCard(data)}
+                    <section id="daily-media" class="learning-side-card daily-listening-card motion-right"></section>
+                </aside>
+            </div>
+        </div>`;
+}
+
 function renderLearningOverviewDashboard(data, forecast = null, badgeText = '') {
-    return renderLearningOverviewDashboardV3(data, forecast, badgeText);
+    return renderLearningOverviewDashboardV4(data, forecast, badgeText);
     return `
         <div class="overview-grid">
             <div class="space-y-5">
@@ -1339,6 +1526,7 @@ function refreshLearningOverviewLocal() {
         null,
         `Ngày ${getCurrentPlanDay(data.learning_day)}`
     );
+    loadDailyContent();
     initMotionReveal();
 }
 
@@ -1363,6 +1551,7 @@ async function loadMyProgress() {
             forecast,
             `Ngày ${data.learning_day} · ${data.stage}`
         );
+        loadDailyContent();
         initMotionReveal();
         table.innerHTML = data.monthly.length ? data.monthly.map(m => `
             <tr>

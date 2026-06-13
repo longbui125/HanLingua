@@ -19,7 +19,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="css/style.css?v=20260613-16">
+    <link rel="stylesheet" href="css/style.css?v=20260613-17">
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -973,17 +973,17 @@
                 </aside>
 
                 <div class="min-w-0 space-y-8">
-                    <section id="user-overview-section" class="user-panel edu-friendly-panel p-4 md:p-6 xl:p-8 min-h-[calc(100vh-130px)]">
+                    <section id="user-overview-section" class="user-panel edu-friendly-panel p-0 min-h-[calc(100vh-130px)]">
                         <div class="overview-learning-stack">
                         <div class="overview-welcome p-5 md:p-7 mb-6 motion-left">
                             <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5">
                                 <div class="max-w-3xl">
                                     <div class="flex flex-wrap items-center gap-2 mb-3">
                                         <span class="bg-white/80 border border-orange-100 text-orange-700 text-xs font-black uppercase px-3 py-1 rounded-full">Không gian học</span>
-                                        <span id="daily-date" class="bg-hanred-600 text-white text-xs font-bold px-3 py-1 rounded-full"></span>
+                                        <span id="daily-date-legacy" class="bg-hanred-600 text-white text-xs font-bold px-3 py-1 rounded-full"></span>
                                     </div>
                                     <h3 class="text-3xl md:text-5xl font-black text-gray-950 leading-tight">Hôm nay mình học nhẹ thôi.</h3>
-                                    <p id="daily-message" class="compact-copy text-base md:text-lg text-gray-600 leading-relaxed mt-3">Đang tải thông điệp hôm nay...</p>
+                                    <p id="daily-message-legacy" class="compact-copy text-base md:text-lg text-gray-600 leading-relaxed mt-3">Đang tải thông điệp hôm nay...</p>
                                 </div>
                                 <div class="flex flex-wrap gap-3 xl:justify-end">
                                     <button onclick="switchView('view-dictation')" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-3 rounded-lg text-sm font-black shadow-lg cursor-pointer">
@@ -1011,7 +1011,7 @@
                                 </div>
                             </div>
 
-                            <div id="daily-media" class="overview-media-card cozy-side-card motion-right"></div>
+                            <div id="daily-media-legacy" class="overview-media-card cozy-side-card motion-right"></div>
                         </div>
                     </section>
 
@@ -1376,7 +1376,7 @@
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260601-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260613-16"></script>
+    <script src="js/main.js?v=20260613-17"></script>
 
     <script>
         window.onload = () => { 
