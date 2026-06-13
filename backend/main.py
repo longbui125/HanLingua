@@ -222,16 +222,58 @@ def build_progress_summary(user: models.User):
         "monthly": monthly_rows,
     }
 
-def get_ytdlp_audio_options(output_template: str):
-    return {
+def build_ytdlp_cookiefile():
+    cookie_file = os.environ.get("YTDLP_COOKIES_FILE", "").strip()
+    if cookie_file:
+        if not os.path.exists(cookie_file):
+            raise RuntimeError("YTDLP_COOKIES_FILE is set but the cookie file does not exist on the server.")
+        return cookie_file, None
+
+    cookie_b64 = os.environ.get("YTDLP_COOKIES_B64", "").strip()
+    cookie_text = os.environ.get("YTDLP_COOKIES", "").strip()
+    if not cookie_b64 and not cookie_text:
+        return None, None
+
+    try:
+        if cookie_b64:
+            cookie_text = base64.b64decode(cookie_b64).decode("utf-8")
+        else:
+            cookie_text = cookie_text.replace("\\n", "\n")
+    except Exception as exc:
+        raise RuntimeError("YTDLP_COOKIES_B64 is not valid base64.") from exc
+
+    cookie_temp = tempfile.NamedTemporaryFile(
+        prefix="hanlingua_ytdlp_cookies_",
+        suffix=".txt",
+        mode="w",
+        encoding="utf-8",
+        delete=False,
+    )
+    try:
+        cookie_temp.write(cookie_text)
+        if not cookie_text.endswith("\n"):
+            cookie_temp.write("\n")
+        return cookie_temp.name, cookie_temp.name
+    finally:
+        cookie_temp.close()
+
+
+def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = None):
+    user_agent = os.environ.get(
+        "YTDLP_USER_AGENT",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+    )
+    opts = {
         "format": "bestaudio[ext=m4a]/bestaudio/best",
         "outtmpl": output_template,
         "noplaylist": True,
         "retries": 5,
         "fragment_retries": 5,
         "socket_timeout": 30,
+        "geo_bypass": True,
+        "force_ipv4": True,
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+            "User-Agent": user_agent,
             "Accept-Language": "en-US,en;q=0.9",
         },
         "extractor_args": {
@@ -239,6 +281,21 @@ def get_ytdlp_audio_options(output_template: str):
         },
         "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "m4a"}],
     }
+    if cookiefile:
+        opts["cookiefile"] = cookiefile
+    return opts
+
+
+def build_youtube_download_error(message: str) -> str:
+    bot_markers = ["Sign in to confirm", "not a bot", "--cookies", "cookies-from-browser"]
+    if any(marker.lower() in message.lower() for marker in bot_markers):
+        return (
+            "YouTube đang yêu cầu xác minh không phải bot. "
+            "Hãy thêm cookie YouTube vào Railway bằng biến YTDLP_COOKIES_B64 "
+            "hoặc tải file audio/video trực tiếp thay vì dán link. "
+            f"Chi tiết: {message}"
+        )
+    return f"Không tải được audio từ YouTube. Link có thể bị chặn, riêng tư hoặc yt-dlp trên server cần cập nhật. Chi tiết: {message}"
 
 
 def find_downloaded_audio(output_template: str) -> str:
@@ -260,14 +317,21 @@ def download_youtube_audio(url: str, output_template: str) -> str:
     if not re.match(r"^https?://", url.strip()):
         raise HTTPException(status_code=400, detail="Link YouTube cần bắt đầu bằng http:// hoặc https://.")
 
+    cookiefile, cookiefile_to_cleanup = build_ytdlp_cookiefile()
     try:
-        with yt_dlp.YoutubeDL(get_ytdlp_audio_options(output_template)) as ydl:
+        with yt_dlp.YoutubeDL(get_ytdlp_audio_options(output_template, cookiefile)) as ydl:
             ydl.download([url.strip()])
     except HTTPException:
         raise
     except Exception as exc:
         message = str(exc).splitlines()[-1] if str(exc) else repr(exc)
+        if any(marker.lower() in message.lower() for marker in ["sign in to confirm", "not a bot", "--cookies", "cookies-from-browser"]):
+            raise RuntimeError(build_youtube_download_error(message)) from exc
         raise RuntimeError(f"Không tải được audio từ YouTube. Link có thể bị chặn, riêng tư hoặc yt-dlp trên server cần cập nhật. Chi tiết: {message}") from exc
+
+    finally:
+        if cookiefile_to_cleanup and os.path.exists(cookiefile_to_cleanup):
+            os.remove(cookiefile_to_cleanup)
 
     return find_downloaded_audio(output_template)
 
@@ -697,7 +761,8 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
 
     filename_base = f"lesson_{int(datetime.datetime.utcnow().timestamp())}"
     output_template = os.path.join(DATA_DIR, filename_base)
-    ydl_opts = get_ytdlp_audio_options(output_template)
+    cookiefile, cookiefile_to_cleanup = build_ytdlp_cookiefile()
+    ydl_opts = get_ytdlp_audio_options(output_template, cookiefile)
 
     audio_path = f"{output_template}.m4a"
     try:
@@ -707,7 +772,14 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
     except Exception as exc:
         if os.path.exists(audio_path):
             os.remove(audio_path)
+        message = str(exc).splitlines()[-1] if str(exc) else repr(exc)
+        if any(marker.lower() in message.lower() for marker in ["sign in to confirm", "not a bot", "--cookies", "cookies-from-browser"]):
+            raise HTTPException(status_code=400, detail=build_youtube_download_error(message)) from exc
         raise HTTPException(status_code=400, detail=f"Không thể tạo bài học từ link này. Hãy cập nhật yt-dlp hoặc thử link công khai khác. Chi tiết: {exc}")
+
+    finally:
+        if cookiefile_to_cleanup and os.path.exists(cookiefile_to_cleanup):
+            os.remove(cookiefile_to_cleanup)
 
     if is_supabase_storage_enabled():
         with open(audio_path, "rb") as f:
