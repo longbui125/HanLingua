@@ -8,6 +8,150 @@ let tabState = {
 };
 let currentPayment = null;
 
+const VIEW_ROUTES = {
+    'view-landing': '/',
+    'view-profile': '/learning/overview',
+    'view-dictation': '/dictation',
+    'view-speaking': '/speaking',
+    'view-admin': '/admin/overview'
+};
+
+const USER_PANEL_ROUTES = {
+    'user-overview-section': '/learning/overview',
+    'user-account-section': '/learning/account',
+    'user-progress-section': '/learning/progress',
+    'user-vocabulary-section': '/learning/vocabulary',
+    'user-notification-section': '/learning/notifications',
+    'user-playlist-section': '/learning/playlist',
+    'user-payment-section': '/learning/payment'
+};
+
+const ADMIN_PANEL_ROUTES = {
+    'admin-overview-section': '/admin/overview',
+    'admin-progress-section': '/admin/progress',
+    'admin-lessons-section': '/admin/lessons',
+    'admin-vocabulary-section': '/admin/vocabulary',
+    'admin-accounts-section': '/admin/accounts',
+    'admin-notifications-section': '/admin/notifications',
+    'admin-payments-section': '/admin/payments'
+};
+
+let isApplyingRoute = false;
+
+function normalizeRoutePath(path = window.location.pathname) {
+    const cleaned = (`/${path}`).replace(/\/+/g, '/').replace(/\/$/, '');
+    return cleaned === '' ? '/' : cleaned;
+}
+
+function routeForPath(path = window.location.pathname) {
+    const routePath = normalizeRoutePath(path);
+    if (routePath === '/' || routePath === '/home') {
+        return { viewId: 'view-landing' };
+    }
+    if (routePath === '/dictation' || routePath === '/ai-dictation') {
+        return { viewId: 'view-dictation' };
+    }
+    if (routePath === '/speaking' || routePath === '/ai-speaking') {
+        return { viewId: 'view-speaking' };
+    }
+    if (routePath === '/pricing') {
+        return { viewId: 'view-landing', sectionId: 'pricing' };
+    }
+    if (routePath === '/learning' || routePath === '/profile') {
+        return { viewId: 'view-profile', userPanelId: 'user-overview-section' };
+    }
+    const userRouteAliases = {
+        '/dashboard': 'user-overview-section',
+        '/account': 'user-account-section',
+        '/progress': 'user-progress-section',
+        '/vocabulary': 'user-vocabulary-section',
+        '/forecast': 'user-vocabulary-section',
+        '/notifications': 'user-notification-section',
+        '/playlist': 'user-playlist-section',
+        '/payment': 'user-payment-section'
+    };
+    if (userRouteAliases[routePath]) {
+        return { viewId: 'view-profile', userPanelId: userRouteAliases[routePath] };
+    }
+    const userPanelId = Object.keys(USER_PANEL_ROUTES).find(id => USER_PANEL_ROUTES[id] === routePath);
+    if (userPanelId) {
+        return { viewId: 'view-profile', userPanelId };
+    }
+    if (routePath === '/admin') {
+        return { viewId: 'view-admin', adminPanelId: 'admin-overview-section' };
+    }
+    const adminPanelId = Object.keys(ADMIN_PANEL_ROUTES).find(id => ADMIN_PANEL_ROUTES[id] === routePath);
+    if (adminPanelId) {
+        return { viewId: 'view-admin', adminPanelId };
+    }
+    return null;
+}
+
+function setRoute(path, { replace = false } = {}) {
+    if (isApplyingRoute || !path) return;
+    const next = path.startsWith('/') ? path : `/${path}`;
+    const current = `${window.location.pathname}${window.location.hash || ''}`;
+    if (current === next) return;
+    const method = replace ? 'replaceState' : 'pushState';
+    window.history[method]({}, '', next);
+}
+
+function setRouteForView(viewId, options = {}) {
+    setRoute(VIEW_ROUTES[viewId], options);
+}
+
+function setRouteForUserPanel(panelId, options = {}) {
+    setRoute(USER_PANEL_ROUTES[panelId], options);
+}
+
+function setRouteForAdminPanel(panelId, options = {}) {
+    setRoute(ADMIN_PANEL_ROUTES[panelId], options);
+}
+
+function setRouteForNavigation(viewId, options = {}) {
+    if (viewId === 'view-profile' && options.userPanelId) {
+        setRouteForUserPanel(options.userPanelId, { replace: options.replaceRoute });
+        return;
+    }
+    if (viewId === 'view-admin' && options.adminPanelId) {
+        setRouteForAdminPanel(options.adminPanelId, { replace: options.replaceRoute });
+        return;
+    }
+    setRouteForView(viewId, { replace: options.replaceRoute });
+}
+
+function applyRouteFromLocation(options = {}) {
+    const route = routeForPath();
+    if (!route) {
+        window.history.replaceState({}, '', '/');
+        switchView('view-landing', { skipRoute: true });
+        return false;
+    }
+
+    isApplyingRoute = true;
+    try {
+        const didSwitch = switchView(route.viewId, {
+            skipRoute: true,
+            userPanelId: route.userPanelId,
+            adminPanelId: route.adminPanelId
+        });
+        if (didSwitch === false) return true;
+
+        if (route.userPanelId) {
+            switchUserPanel(route.userPanelId, { skipRoute: true });
+        }
+        if (route.adminPanelId) {
+            switchAdminPanel(route.adminPanelId, { skipRoute: true });
+        }
+        if (route.viewId === 'view-landing' && (route.sectionId || window.location.hash)) {
+            setTimeout(() => scrollToSection(route.sectionId || window.location.hash.slice(1)), 80);
+        }
+        return true;
+    } finally {
+        isApplyingRoute = false;
+    }
+}
+
 // Authentication UI
 const AuthUI = {
     isLoginMode: true,
@@ -30,10 +174,8 @@ const AuthUI = {
         loadDailyContent();
         showWelcomeModal();
         initMotionReveal();
-        if (currentUser && ['admin', 'manager'].includes(currentUser.role)) {
-            switchView('view-admin');
-        } else if (currentUser) {
-            switchView('view-profile');
+        if (!applyRouteFromLocation({ replace: true })) {
+            switchView('view-landing', { replaceRoute: true });
         }
     },
 
@@ -134,7 +276,7 @@ const AuthUI = {
                                     <button onclick="switchMorePanel('about')" id="more-tab-about" class="more-tab bg-gray-100 text-gray-600 rounded-md px-3 py-2">Giới thiệu</button>
                                 </div>
                                 <div id="more-panel-account" class="more-panel"><div class="text-xs font-black text-gray-400 uppercase mb-3">Thông tin người dùng</div><div id="more-user-info" class="space-y-3 text-sm text-gray-600"><p>Vui lòng đăng nhập để xem thông tin tài khoản.</p></div></div>
-                                <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div><p>Chọn gói học và thanh toán bằng QR Vietcombank. Sau khi chuyển khoản, admin xác minh và mở quyền học.</p><button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-payment-section'), 50); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button></div>
+                                <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div><p>Chọn gói học và thanh toán bằng QR Vietcombank. Sau khi chuyển khoản, admin xác minh và mở quyền học.</p><button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' }); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button></div>
                                 <div id="more-panel-features" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Tính năng</div><p><b>AI Dictation:</b> nghe chép, chấm điểm, hiện lỗi sai và đáp án.</p><p><b>AI Speaking:</b> luyện nói theo ngữ cảnh, tăng phản xạ giao tiếp.</p><p><b>Forecast Vocabulary:</b> học thẻ từ TOPIK theo chủ đề, có nghĩa và ví dụ.</p><p><b>Dashboard:</b> streak, lộ trình ngày, accuracy, activity log.</p></div>
                                 <div id="more-panel-about" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Giới thiệu</div><p>HanLingua là nền tảng học tiếng Hàn tập trung vào Dictation, Speaking và từ vựng TOPIK theo chủ đề.</p><p>Nền tảng có lộ trình học rõ ràng, dashboard tiến độ, AI Dictation, AI Speaking và Forecast Vocabulary.</p></div>
                             </div>
@@ -167,7 +309,7 @@ const AuthUI = {
                         <button onclick="toggleAccountMenu()" class="w-7 h-10 flex items-center justify-center text-gray-400 hover:text-hanred-600 cursor-pointer" title="Menu tài khoản"><i class="fa-solid fa-chevron-down text-xs shrink-0"></i></button>
                     </div>
                     <div id="account-menu" class="hidden absolute right-0 top-[3.75rem] bg-white border border-gray-200 rounded-2xl shadow-xl p-1.5 min-w-[150px] z-50">
-                        <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-account-section'), 50); toggleAccountMenu();" class="w-full h-8 flex items-center gap-1.5 text-left px-2.5 rounded-lg text-[11px] font-medium leading-none text-gray-600 hover:bg-gray-50 cursor-pointer"><i class="fa-solid fa-user-shield text-gray-400 w-3 text-center text-[11px]"></i><span>Tài khoản</span></button>
+                        <button onclick="switchView('view-profile', { userPanelId: 'user-account-section' }); toggleAccountMenu();" class="w-full h-8 flex items-center gap-1.5 text-left px-2.5 rounded-lg text-[11px] font-medium leading-none text-gray-600 hover:bg-gray-50 cursor-pointer"><i class="fa-solid fa-user-shield text-gray-400 w-3 text-center text-[11px]"></i><span>Tài khoản</span></button>
                         <button onclick="AuthUI.logout()" class="w-full h-8 flex items-center gap-1.5 text-left px-2.5 rounded-lg text-[11px] font-medium leading-none text-gray-600 hover:bg-gray-50 cursor-pointer"><i class="fa-solid fa-arrow-right-from-bracket text-gray-400 w-3 text-center text-[11px]"></i><span>Đăng xuất</span></button>
                     </div>
                     <div id="avatar-action-menu" class="hidden absolute right-12 top-[3.2rem] bg-white border border-gray-200 rounded-2xl shadow-xl p-1.5 min-w-[135px] z-50">
@@ -190,7 +332,7 @@ const AuthUI = {
 
     logout() {
         localStorage.removeItem('access_token');
-        location.reload();
+        window.location.href = '/';
     }
 };
 
@@ -273,8 +415,7 @@ function openUpgradePlans() {
         return;
     }
 
-    switchView('view-profile');
-    setTimeout(() => switchUserPanel('user-payment-section'), 50);
+    switchView('view-profile', { userPanelId: 'user-payment-section' });
 }
 
 function switchMorePanel(panel) {
@@ -428,7 +569,7 @@ function renderUserAccessState() {
                 <div class="font-black text-lg">Tài khoản đã hết quyền học</div>
                 <div class="text-sm">Tính năng đang khóa. Mua gói để học tiếp.</div>
             </div>
-            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-payment-section'), 50)" class="bg-hanred-600 text-white px-4 py-2 rounded-lg text-sm font-bold w-max cursor-pointer">Mua gói học</button>
+            <button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' })" class="bg-hanred-600 text-white px-4 py-2 rounded-lg text-sm font-bold w-max cursor-pointer">Mua gói học</button>
         </div>`;
         [dictationBadge, speakingBadge].forEach(el => {
         if (el) {
@@ -443,21 +584,32 @@ function renderUserAccessState() {
 }
 
 // --- 2. ĐIỀU HƯỚNG VIEW ---
-function switchView(viewId) {
+function switchView(viewId, options = {}) {
     document.getElementById('more-menu')?.classList.add('hidden');
     document.getElementById('account-menu')?.classList.add('hidden');
     document.getElementById('avatar-action-menu')?.classList.add('hidden');
 
     const protectedViews = ['view-dictation', 'view-admin', 'view-speaking', 'view-profile'];
     if (protectedViews.includes(viewId) && !currentUser) {
+        if (!options.skipRoute) setRouteForNavigation(viewId, options);
         AuthUI.openModal(true);
-        return;
+        return false;
+    }
+    if (viewId === 'view-admin' && !['admin', 'manager'].includes(currentUser.role)) {
+        if (isApplyingRoute) {
+            window.history.replaceState({}, '', USER_PANEL_ROUTES['user-overview-section']);
+        }
+        switchView('view-profile', { userPanelId: 'user-overview-section', replaceRoute: true });
+        return false;
     }
     if ((viewId === 'view-dictation' || viewId === 'view-speaking') && !currentUser.trial_active) {
         alert('Hết quyền học. Vui lòng mua gói.');
-        switchView('view-landing');
+        if (isApplyingRoute) {
+            window.history.replaceState({}, '', '/pricing');
+        }
+        switchView('view-landing', { replaceRoute: true });
         setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
-        return;
+        return false;
     }
 
     document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
@@ -471,7 +623,7 @@ function switchView(viewId) {
         if (title && currentUser) {
             title.innerHTML = `<i class="fa-solid fa-shield-halved text-hanred-600 mr-2"></i> Bảng điều khiển ${currentUser.role === 'manager' ? 'Manager' : 'Quản trị viên'}`;
         }
-        switchAdminPanel('admin-overview-section');
+        switchAdminPanel(options.adminPanelId || 'admin-overview-section', { skipRoute: true });
         AdminUI.loadLessonList();
         AdminUI.loadUsers();
         AdminUI.loadPayments();
@@ -481,10 +633,14 @@ function switchView(viewId) {
         loadUserLessonList(); 
     }
     if (viewId === 'view-profile') {
-        switchUserPanel('user-overview-section');
+        switchUserPanel(options.userPanelId || 'user-overview-section', { skipRoute: true });
         loadMyProgress();
     }
+    if (!options.skipRoute) {
+        setRouteForNavigation(viewId, options);
+    }
     setTimeout(initMotionReveal, 50);
+    return true;
 }
 
 function initMotionReveal() {
@@ -612,18 +768,14 @@ function setMainNavActive(activeId) {
 
 function returnToLearningSpace() {
     if (currentUser && !['admin', 'manager'].includes(currentUser.role)) {
-        switchView('view-profile');
-        setTimeout(() => switchUserPanel('user-overview-section'), 50);
+        switchView('view-profile', { userPanelId: 'user-overview-section' });
         return;
     }
     switchView('view-landing');
 }
 
 function openVocabularyFeature() {
-    switchView('view-profile');
-    if (currentUser) {
-        setTimeout(() => switchUserPanel('user-vocabulary-section'), 50);
-    }
+    switchView('view-profile', { userPanelId: 'user-vocabulary-section' });
 }
 
 function formatStudyTime(minutes) {
@@ -1879,23 +2031,25 @@ function setSideNavActive(buttons, activeButton, activeClasses) {
     activeButton.querySelector('i')?.classList.remove('text-gray-400');
 }
 
-function switchAdminPanel(panelId) {
+function switchAdminPanel(panelId, options = {}) {
     document.querySelectorAll('.admin-panel').forEach(panel => panel.classList.add('hidden'));
     document.getElementById(panelId)?.classList.remove('hidden');
     const buttons = document.querySelectorAll('.admin-nav-btn');
     const activeButton = document.querySelector(`[data-admin-nav="${panelId}"]`);
     setSideNavActive(buttons, activeButton, ['bg-blue-50', 'text-blue-700', 'border-r-4', 'border-blue-600']);
     if (panelId === 'admin-vocabulary-section') AdminUI.loadVocabulary();
+    if (!options.skipRoute) setRouteForAdminPanel(panelId);
     setTimeout(initMotionReveal, 30);
 }
 
-function switchUserPanel(panelId) {
+function switchUserPanel(panelId, options = {}) {
     document.querySelectorAll('.user-panel').forEach(panel => panel.classList.add('hidden'));
     document.getElementById(panelId)?.classList.remove('hidden');
     const buttons = document.querySelectorAll('.user-nav-btn');
     const activeButton = document.querySelector(`[data-user-nav="${panelId}"]`);
     setSideNavActive(buttons, activeButton, ['sidebar-pulse', 'bg-red-50', 'text-hanred-700', 'border-r-4', 'border-hanred-600']);
     if (panelId === 'user-vocabulary-section') VocabularyUI.load();
+    if (!options.skipRoute) setRouteForUserPanel(panelId);
     setTimeout(initMotionReveal, 30);
 }
 
@@ -1965,8 +2119,7 @@ function toggleDailyTask(dayNumber, taskId, checked) {
         loadMyProgress();
         setTimeout(() => {
             alert('Đã hoàn thành Speaking. Tiếp theo hãy review tiến độ học hôm nay.');
-            switchView('view-profile');
-            setTimeout(() => switchUserPanel('user-progress-section'), 50);
+            switchView('view-profile', { userPanelId: 'user-progress-section' });
         }, 250);
         return;
     }
@@ -1989,7 +2142,8 @@ function completeLearningDay(dayNumber) {
 }
 
 function goToLandingSection(sectionId) {
-    switchView('view-landing');
+    switchView('view-landing', { skipRoute: true });
+    setRoute(`/#${sectionId}`);
     setMainNavActive('nav-home');
     setTimeout(() => scrollToSection(sectionId), 50);
 }
@@ -2035,6 +2189,10 @@ async function notifyPaymentDone() {
 function closePaymentModal() {
     document.getElementById('payment-modal').classList.add('hidden');
 }
+
+window.addEventListener('popstate', () => {
+    applyRouteFromLocation();
+});
 
 AuthUI.init();
 

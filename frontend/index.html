@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <base href="/">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HanLingua - Hệ sinh thái học tiếng Hàn toàn diện</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -57,7 +58,7 @@
                                 <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3">
                                     <div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div>
                                     <p>Chọn gói học và thanh toán bằng QR Vietcombank. Sau khi chuyển khoản, admin xác minh và mở quyền học.</p>
-                                    <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-payment-section'), 50); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button>
+                                    <button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' }); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button>
                                 </div>
                                 <div id="more-panel-features" class="more-panel hidden text-sm text-gray-600 space-y-3">
                                     <div class="text-xs font-black text-gray-400 uppercase">Tính năng</div>
@@ -155,12 +156,12 @@
                             <button onclick="switchView('view-profile')" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-red-50 text-hanred-700 border-r-4 border-hanred-600 text-left transition"><i class="fa-solid fa-table-cells-large"></i> Tổng quan học tập</button>
                             <button onclick="switchView('view-dictation')" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-file-audio text-gray-400"></i> Luyện nghe chép</button>
                             <button onclick="switchView('view-speaking')" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-microphone-lines text-gray-400"></i> Luyện nói cùng AI</button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-vocabulary-section'), 50)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-layer-group text-gray-400"></i> Học từ vựng theo chủ đề</button>
-                            <button onclick="switchView('view-profile')" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-chart-line text-gray-400"></i> Tiến độ</button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-account-section'), 50)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-user-shield text-gray-400"></i> Tài khoản</button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-notification-section'), 50)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-bell text-gray-400"></i> Thông báo</button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-playlist-section'), 50)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-music text-gray-400"></i> Playlist/Podcast</button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-payment-section'), 50)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-credit-card text-gray-400"></i> Thanh toán/Gói học</button>
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-vocabulary-section' })" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-layer-group text-gray-400"></i> Học từ vựng theo chủ đề</button>
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-progress-section' })" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-chart-line text-gray-400"></i> Tiến độ</button>
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-account-section' })" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-user-shield text-gray-400"></i> Tài khoản</button>
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-notification-section' })" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-bell text-gray-400"></i> Thông báo</button>
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-playlist-section' })" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-music text-gray-400"></i> Playlist/Podcast</button>
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' })" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 text-left transition"><i class="fa-solid fa-credit-card text-gray-400"></i> Thanh toán/Gói học</button>
                         </div>
                     </aside>
 
@@ -192,17 +193,17 @@
                                 <h3 class="font-black text-gray-900 text-lg">Forecast từ vựng</h3>
                                 <p class="text-sm text-gray-500 mt-2">Từ TOPIK theo chủ đề.</p>
                             </button>
-                            <button onclick="switchView('view-profile')" class="text-left bg-white border border-blue-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-progress-section' })" class="text-left bg-white border border-blue-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
                                 <div class="w-12 h-12 bg-blue-50 text-blue-700 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-chart-line"></i></div>
                                 <h3 class="font-black text-gray-900 text-lg">Tiến độ</h3>
                                 <p class="text-sm text-gray-500 mt-2">Điểm và lịch sử.</p>
                             </button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-playlist-section'), 50)" class="text-left bg-white border border-pink-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-playlist-section' })" class="text-left bg-white border border-pink-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
                                 <div class="w-12 h-12 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-music"></i></div>
                                 <h3 class="font-black text-gray-900 text-lg">Playlist/Podcast</h3>
                                 <p class="text-sm text-gray-500 mt-2">Nghe mỗi ngày.</p>
                             </button>
-                            <button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-payment-section'), 50)" class="text-left bg-white border border-green-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
+                            <button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' })" class="text-left bg-white border border-green-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
                                 <div class="w-12 h-12 bg-green-50 text-green-700 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-credit-card"></i></div>
                                 <h3 class="font-black text-gray-900 text-lg">Thanh toán/Gói học</h3>
                                 <p class="text-sm text-gray-500 mt-2">Gói học và QR.</p>
@@ -1344,7 +1345,7 @@
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260601-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260613-18"></script>
+    <script src="js/main.js?v=20260613-19"></script>
 
     <script>
         window.onload = () => { 
