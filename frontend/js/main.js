@@ -112,22 +112,22 @@ const AuthUI = {
         if (mainNav) {
             if (currentUser && ['admin', 'manager'].includes(currentUser.role)) {
                 mainNav.innerHTML = `
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-1 flex items-center gap-1">
-                        <button id="nav-admin" onclick="switchView('view-admin')" class="main-nav-btn px-4 py-2.5 rounded-xl text-sm font-black transition bg-white text-blue-700 shadow-sm">Bảng quản trị</button>
+                    <div class="bg-white/70 border border-blue-100 rounded-lg p-1 flex items-center gap-1 shadow-sm">
+                        <button id="nav-admin" onclick="switchView('view-admin')" class="main-nav-btn px-4 py-2.5 rounded-md text-sm font-black transition bg-gray-950 text-white shadow-sm">Bảng quản trị</button>
                     </div>`;
             } else {
                 mainNav.innerHTML = `
-                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-1 flex items-center gap-1">
-                        <button id="nav-home" onclick="switchView('view-landing')" class="main-nav-btn px-4 py-2.5 rounded-xl text-sm font-black transition bg-white text-gray-900 shadow-sm">Trang chủ</button>
-                        <button id="nav-learning" onclick="switchView('view-profile')" class="main-nav-btn px-4 py-2.5 rounded-xl text-sm font-black transition text-gray-500 hover:text-hanred-600">Không gian học tập</button>
+                    <div class="bg-white/70 border border-gray-200 rounded-lg p-1 flex items-center gap-1 shadow-sm">
+                        <button id="nav-home" onclick="switchView('view-landing')" class="main-nav-btn px-4 py-2.5 rounded-md text-sm font-black transition bg-gray-950 text-white shadow-sm">Trang chủ</button>
+                        <button id="nav-learning" onclick="switchView('view-profile')" class="main-nav-btn px-4 py-2.5 rounded-md text-sm font-black transition text-gray-500 hover:text-hanred-600">Không gian học tập</button>
                         <div class="relative">
-                            <button id="nav-more" onclick="toggleMoreMenu()" class="main-nav-btn px-4 py-2.5 rounded-xl text-sm font-black transition text-gray-500 hover:text-hanred-600">Khác <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
-                            <div id="more-menu" class="hidden absolute left-1/2 -translate-x-1/2 top-12 w-[420px] bg-white border border-gray-200 rounded-2xl shadow-xl p-4 z-50 text-left">
+                            <button id="nav-more" onclick="toggleMoreMenu()" class="main-nav-btn px-4 py-2.5 rounded-md text-sm font-black transition text-gray-500 hover:text-hanred-600">Khác <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
+                            <div id="more-menu" class="hidden absolute left-1/2 -translate-x-1/2 top-12 w-[420px] bg-white border border-gray-200 rounded-lg shadow-xl p-4 z-50 text-left">
                                 <div class="grid grid-cols-4 gap-2 mb-4 text-xs font-black">
-                                    <button onclick="switchMorePanel('account')" id="more-tab-account" class="more-tab bg-hanred-600 text-white rounded-xl px-3 py-2">Hồ sơ</button>
-                                    <button onclick="switchMorePanel('payment')" id="more-tab-payment" class="more-tab bg-gray-100 text-gray-600 rounded-xl px-3 py-2">Thanh toán</button>
-                                    <button onclick="switchMorePanel('features')" id="more-tab-features" class="more-tab bg-gray-100 text-gray-600 rounded-xl px-3 py-2">Tính năng</button>
-                                    <button onclick="switchMorePanel('about')" id="more-tab-about" class="more-tab bg-gray-100 text-gray-600 rounded-xl px-3 py-2">Giới thiệu</button>
+                                    <button onclick="switchMorePanel('account')" id="more-tab-account" class="more-tab bg-hanred-600 text-white rounded-md px-3 py-2">Hồ sơ</button>
+                                    <button onclick="switchMorePanel('payment')" id="more-tab-payment" class="more-tab bg-gray-100 text-gray-600 rounded-md px-3 py-2">Thanh toán</button>
+                                    <button onclick="switchMorePanel('features')" id="more-tab-features" class="more-tab bg-gray-100 text-gray-600 rounded-md px-3 py-2">Tính năng</button>
+                                    <button onclick="switchMorePanel('about')" id="more-tab-about" class="more-tab bg-gray-100 text-gray-600 rounded-md px-3 py-2">Giới thiệu</button>
                                 </div>
                                 <div id="more-panel-account" class="more-panel"><div class="text-xs font-black text-gray-400 uppercase mb-3">Thông tin người dùng</div><div id="more-user-info" class="space-y-3 text-sm text-gray-600"><p>Vui lòng đăng nhập để xem thông tin tài khoản.</p></div></div>
                                 <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div><p>Chọn gói học và thanh toán bằng QR Vietcombank. Sau khi chuyển khoản, admin xác minh và mở quyền học.</p><button onclick="switchView('view-profile'); setTimeout(() => switchUserPanel('user-payment-section'), 50); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button></div>
@@ -141,14 +141,14 @@ const AuthUI = {
         }
         if (currentUser) {
             const btnExtra = `
-                <button onclick="openUpgradePlans()" class="h-12 inline-flex items-center gap-2 bg-hanred-600 hover:bg-hanred-700 text-white px-3 sm:px-4 rounded-2xl text-sm font-black shadow-md transition cursor-pointer whitespace-nowrap" title="Nâng cấp gói">
+                <button onclick="openUpgradePlans()" class="h-12 inline-flex items-center gap-2 bg-hanred-600 hover:bg-hanred-700 text-white px-3 sm:px-4 rounded-lg text-sm font-black shadow-md transition cursor-pointer whitespace-nowrap" title="Nâng cấp gói">
                     <i class="fa-solid fa-credit-card"></i>
                     <span>Nâng cấp gói</span>
                 </button>`;
             
             container.innerHTML = `
                 <div class="flex items-center gap-3 relative">
-                    <button onclick="toggleDarkMode()" class="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center cursor-pointer hover:bg-black transition shrink-0" title="Dark mode">
+                    <button onclick="toggleDarkMode()" class="w-12 h-12 bg-gray-900 text-white rounded-lg flex items-center justify-center cursor-pointer hover:bg-black transition shrink-0" title="Dark mode">
                         <i class="theme-toggle-icon fa-solid fa-moon"></i>
                     </button>
                     ${btnExtra}
@@ -175,11 +175,11 @@ const AuthUI = {
             renderMoreUserInfo();
         } else {
             container.innerHTML = `
-                <button onclick="toggleDarkMode()" class="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center cursor-pointer hover:bg-black transition shrink-0" title="Dark mode">
+                <button onclick="toggleDarkMode()" class="w-12 h-12 bg-gray-900 text-white rounded-lg flex items-center justify-center cursor-pointer hover:bg-black transition shrink-0" title="Dark mode">
                     <i class="theme-toggle-icon fa-solid fa-moon"></i>
                 </button>
                 <button onclick="AuthUI.openModal(true)" class="hidden md:block text-gray-600 font-medium hover:text-hanred-600 transition cursor-pointer">Đăng nhập</button>
-                <button onclick="AuthUI.openModal(false)" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-2 rounded-lg font-medium transition shadow-md cursor-pointer">Bắt đầu ngay</button>`;
+                <button onclick="AuthUI.openModal(false)" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-2.5 rounded-lg font-black transition shadow-md cursor-pointer">Bắt đầu ngay</button>`;
         }
     },
 
@@ -333,22 +333,22 @@ async function loadDailyContent() {
         messageEl.innerText = data.message;
         mediaEl.innerHTML = `
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <div class="text-xs font-bold ${data.media.type === 'podcast' ? 'text-purple-600' : 'text-hanred-600'} uppercase">${data.media.type === 'podcast' ? 'Podcast gợi ý' : 'Nhạc gợi ý'}</div>
-                    <div class="font-black text-gray-900 text-lg">${data.media.title}</div>
-                    <p class="text-sm text-gray-500 mt-1">${data.media.description}</p>
+                <div class="min-w-0">
+                    <div class="text-xs font-black ${data.media.type === 'podcast' ? 'text-purple-600' : 'text-hanred-600'} uppercase">${data.media.type === 'podcast' ? 'Podcast' : 'Nhạc'}</div>
+                    <div class="font-black text-gray-900 text-lg truncate">${data.media.title}</div>
+                    <p class="text-sm text-gray-500 mt-1 compact-copy">${data.media.description}</p>
                 </div>
-                <a href="${data.media.url}" target="_blank" rel="noopener" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold w-max hover:bg-black transition">
-                    Mở nguồn nghe <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                <a href="${data.media.url}" target="_blank" rel="noopener" class="bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-black w-max hover:bg-black">
+                    Nghe <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
                 </a>
             </div>`;
         const recommended = data.media;
         playlistEl.innerHTML = `
-            <a href="${recommended.url}" target="_blank" rel="noopener" class="block bg-purple-50 border border-purple-100 hover:bg-purple-100 rounded-xl px-4 py-4 transition">
-                <div class="text-xs text-purple-600 font-bold uppercase mb-1">Tự động chọn hôm nay</div>
-                <div class="font-black text-gray-900">${recommended.title}</div>
-                <div class="text-sm text-gray-500 mt-2">${recommended.description}</div>
-                <div class="text-xs text-purple-700 font-bold mt-3">Mở bài gợi ý <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></div>
+            <a href="${recommended.url}" target="_blank" rel="noopener" class="block bg-purple-50 border border-purple-100 hover:bg-purple-100 rounded-2xl px-4 py-4">
+                <div class="text-xs text-purple-600 font-black uppercase mb-1">Gợi ý</div>
+                <div class="font-black text-gray-900 compact-copy">${recommended.title}</div>
+                <div class="text-sm text-gray-500 mt-2 compact-copy">${recommended.description}</div>
+                <div class="text-xs text-purple-700 font-black mt-3">Mở bài <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></div>
             </a>`;
     } catch (e) {
         messageEl.innerText = "Không thể tải nội dung hôm nay. Bạn vẫn có thể bắt đầu bằng một bài nghe ngắn.";
@@ -482,11 +482,11 @@ function updateMainNav(viewId) {
 
 function setMainNavActive(activeId) {
     document.querySelectorAll('.main-nav-btn').forEach(btn => {
-        btn.className = 'main-nav-btn px-4 py-2.5 rounded-xl text-sm font-black transition text-gray-500 hover:text-hanred-600';
+        btn.className = 'main-nav-btn px-4 py-2.5 rounded-md text-sm font-black transition text-gray-500 hover:text-hanred-600';
     });
     const active = document.getElementById(activeId);
     if (active) {
-        active.className = 'main-nav-btn px-4 py-2.5 rounded-xl text-sm font-black transition bg-white text-gray-900 shadow-sm';
+        active.className = 'main-nav-btn px-4 py-2.5 rounded-md text-sm font-black transition bg-gray-950 text-white shadow-sm';
     }
 }
 
@@ -612,13 +612,119 @@ function buildLocalProgressSummary(serverData = null) {
 function skillBar(label, value, colorClass) {
     const safeValue = Math.max(0, Math.min(100, Number(value || 0)));
     return `
-        <div>
-            <div class="flex justify-between text-sm font-bold mb-2">
+        <div class="rounded-2xl bg-gray-50 border border-gray-100 p-4">
+            <div class="flex justify-between text-sm font-black mb-2">
                 <span class="text-gray-700">${label}</span>
                 <span class="text-gray-900">${safeValue}%</span>
             </div>
-            <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div class="skill-meter h-2.5 bg-white rounded-full overflow-hidden border border-gray-100">
                 <div class="h-full ${colorClass} rounded-full" style="width: ${safeValue}%"></div>
+            </div>
+        </div>`;
+}
+
+function renderMetricCard({ label, value, caption, icon, accentClass, iconClass }) {
+    return `
+        <div class="stat-card motion-card rounded-2xl p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="text-xs text-gray-500 font-black uppercase tracking-wide">${label}</div>
+                    <div class="text-3xl font-black ${accentClass} mt-2 leading-none">${value}</div>
+                </div>
+                <span class="stat-icon ${iconClass}"><i class="fa-solid ${icon}"></i></span>
+            </div>
+            <div class="text-sm text-gray-500 mt-4">${caption}</div>
+        </div>`;
+}
+
+function renderOverviewStats(data) {
+    return `
+        <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
+            ${renderMetricCard({
+                label: 'Streak',
+                value: `${data.streak_days || 0}`,
+                caption: 'ngày liên tục',
+                icon: 'fa-fire',
+                accentClass: 'text-orange-600',
+                iconClass: 'bg-orange-50 text-orange-600'
+            })}
+            ${renderMetricCard({
+                label: 'Dictation',
+                value: `${data.dictation_completed || 0}`,
+                caption: 'bài đã chép',
+                icon: 'fa-headphones-simple',
+                accentClass: 'text-hanred-600',
+                iconClass: 'bg-red-50 text-hanred-600'
+            })}
+            ${renderMetricCard({
+                label: 'Thời gian',
+                value: formatStudyTime(data.total_study_minutes),
+                caption: 'tổng luyện tập',
+                icon: 'fa-clock',
+                accentClass: 'text-blue-700',
+                iconClass: 'bg-blue-50 text-blue-700'
+            })}
+            ${renderMetricCard({
+                label: 'Độ đúng',
+                value: `${data.avg_score || 0}%`,
+                caption: 'trung bình',
+                icon: 'fa-bullseye',
+                accentClass: 'text-green-700',
+                iconClass: 'bg-green-50 text-green-700'
+            })}
+        </div>`;
+}
+
+function renderRecentActivities(activities = []) {
+    if (!activities.length) {
+        return '<div class="text-sm text-gray-400 py-5">Chưa có lịch sử.</div>';
+    }
+    return activities.map(item => `
+        <div class="flex items-center justify-between gap-3 py-3 border-b border-gray-100 last:border-b-0">
+            <div class="min-w-0">
+                <div class="font-black text-gray-900 truncate">${escapeHtml(item.title || 'Bài học HanLingua')}</div>
+                <div class="text-xs text-gray-500 mt-1">${escapeHtml(item.type || 'Dictation')} · ${formatActivityDate(item.created_at)}</div>
+            </div>
+            <span class="shrink-0 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-black">${Number(item.score || 0)}%</span>
+        </div>`).join('');
+}
+
+function renderSkillPanel(data) {
+    return `
+        <div class="soft-panel rounded-2xl p-5 motion-card">
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                    <div class="text-xs font-black text-blue-700 uppercase">Kỹ năng</div>
+                    <h4 class="text-lg font-black text-gray-900">Bản đồ hiện tại</h4>
+                </div>
+                <span class="stat-icon bg-blue-50 text-blue-700"><i class="fa-solid fa-chart-simple"></i></span>
+            </div>
+            <div class="space-y-3">
+                ${skillBar('Chép chính tả', data.dictation_avg || data.avg_score || 0, 'bg-hanred-600')}
+                ${skillBar('Phát âm', data.speaking_avg || 0, 'bg-blue-600')}
+                ${skillBar('Forecast', getVocabularyProgressPercent(), 'bg-purple-600')}
+            </div>
+        </div>`;
+}
+
+function renderLearningOverviewDashboard(data, forecast = null, badgeText = '') {
+    return `
+        ${renderOverviewStats(data)}
+        ${renderDailyLearningPlan(data)}
+        <div class="grid 2xl:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] gap-5">
+            ${renderForecastPanel(forecast)}
+            <div class="space-y-5">
+                ${renderSkillPanel(data)}
+                <div class="soft-panel rounded-2xl p-5 motion-card">
+                    <div class="flex items-center justify-between gap-4 mb-3">
+                        <div>
+                            <div class="text-xs font-black text-gray-500 uppercase">Nhật ký</div>
+                            <h4 class="text-lg font-black text-gray-900">Gần đây</h4>
+                        </div>
+                        ${badgeText ? `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-black">${badgeText}</span>` : ''}
+                    </div>
+                    ${renderRecentActivities(data.recent_activities || [])}
+                </div>
             </div>
         </div>`;
 }
@@ -633,36 +739,39 @@ function renderForecastPanel(forecast = null) {
         notification: 'Hoàn thành thêm bài để Forecast tốt hơn.'
     };
     return `
-        <div class="bg-gradient-to-br from-purple-50 via-white to-red-50 border border-purple-100 rounded-2xl p-5 md:p-6 shadow-sm mb-6">
-            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-5">
+        <div class="soft-panel rounded-2xl p-5 motion-card">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
                 <div>
-                    <div class="text-xs font-black text-purple-700 uppercase">Forecast hôm nay</div>
-                    <h4 class="text-2xl font-black text-gray-900 mt-1">Ôn tập và gợi ý</h4>
+                    <div class="text-xs font-black text-purple-700 uppercase">Forecast</div>
+                    <h4 class="text-xl font-black text-gray-900 mt-1">Gợi ý ôn hôm nay</h4>
+                    <p class="text-sm text-gray-500 mt-2 compact-copy">${escapeHtml(data.notification || '')}</p>
                 </div>
-                <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-purple-700 hover:bg-purple-800 text-white px-5 py-3 rounded-xl text-sm font-bold shadow cursor-pointer transition">Mở Forecast Vocabulary</button>
+                <button onclick="switchUserPanel('user-vocabulary-section')" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-xl text-sm font-black shadow cursor-pointer">
+                    Mở thẻ từ
+                </button>
             </div>
-            <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-                <div class="bg-white border border-purple-100 rounded-2xl p-4">
-                    <div class="text-xs font-bold text-purple-600 uppercase">Cần ôn</div>
-                    <div class="text-3xl font-black text-purple-700 mt-2">${data.review_count || 0}</div>
-                    <p class="text-sm text-gray-500 mt-2">Chủ đề ${escapeHtml(data.review_topic || 'lỗi sai gần đây')}</p>
+            <div class="grid md:grid-cols-2 gap-3">
+                <div class="forecast-tile rounded-2xl p-4">
+                    <div class="text-xs font-black text-purple-600 uppercase">Cần ôn</div>
+                    <div class="flex items-end gap-2 mt-2">
+                        <div class="text-3xl font-black text-purple-700 leading-none">${data.review_count || 0}</div>
+                        <div class="text-sm text-gray-500 pb-1">thẻ</div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3 compact-copy">${escapeHtml(data.review_topic || 'lỗi sai gần đây')}</p>
                 </div>
-                <div class="bg-white border border-red-100 rounded-2xl p-4">
-                    <div class="text-xs font-bold text-hanred-600 uppercase">Lỗi chính</div>
-                    <p class="text-sm text-gray-600 mt-2 leading-relaxed">${escapeHtml(data.mistake_forecast?.message || '')}</p>
+                <div class="forecast-tile rounded-2xl p-4">
+                    <div class="text-xs font-black text-hanred-600 uppercase">Lỗi chính</div>
+                    <p class="text-sm text-gray-600 mt-3 compact-copy">${escapeHtml(data.mistake_forecast?.message || '')}</p>
                 </div>
-                <div class="bg-white border border-blue-100 rounded-2xl p-4">
-                    <div class="text-xs font-bold text-blue-700 uppercase">Gợi ý</div>
-                    <p class="text-sm text-gray-600 mt-2 leading-relaxed">${escapeHtml(data.suggested_lesson || '')}</p>
+                <div class="forecast-tile rounded-2xl p-4">
+                    <div class="text-xs font-black text-blue-700 uppercase">Việc tiếp theo</div>
+                    <p class="text-sm text-gray-600 mt-3 compact-copy">${escapeHtml(data.suggested_lesson || '')}</p>
                 </div>
-                <div class="bg-white border border-green-100 rounded-2xl p-4">
-                    <div class="text-xs font-bold text-green-700 uppercase">Tuần này</div>
+                <div class="forecast-tile rounded-2xl p-4">
+                    <div class="text-xs font-black text-green-700 uppercase">TOPIK</div>
                     <div class="text-2xl font-black text-green-700 mt-2">${data.weekly_insight?.days_to_topik || 45} ngày</div>
-                    <p class="text-sm text-gray-500 mt-2">${escapeHtml(data.weekly_insight?.message || '')}</p>
+                    <p class="text-sm text-gray-500 mt-3 compact-copy">${escapeHtml(data.weekly_insight?.message || '')}</p>
                 </div>
-            </div>
-            <div class="mt-4 bg-yellow-50 border border-yellow-100 text-yellow-800 rounded-2xl p-4 text-sm font-bold">
-                <i class="fa-solid fa-bell mr-2"></i>${escapeHtml(data.notification || '')}
             </div>
         </div>`;
 }
@@ -909,48 +1018,54 @@ function renderDailyLearningPlan(data) {
             ? 'bg-blue-50 border-blue-100 text-blue-700'
             : 'bg-green-50 border-green-100 text-green-700';
     return `
-        <div class="bg-white border-2 border-hanred-100 rounded-2xl p-5 shadow-sm mb-6">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
+        <div class="soft-panel rounded-2xl p-5 motion-card">
+            <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4 mb-5">
                 <div>
-                    <div class="text-xs font-bold text-hanred-600 uppercase">Lộ trình học hôm nay</div>
-                    <h4 class="text-2xl font-black text-gray-900">Ngày ${dayNumber}: ${plan.title}</h4>
-                    <p class="text-sm text-gray-500 mt-1">${plan.totalMinutes} phút.</p>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="bg-hanred-600 text-white text-xs font-black px-3 py-1 rounded-full">Ngày ${dayNumber}</span>
+                        <span class="bg-gray-100 text-gray-700 text-xs font-black px-3 py-1 rounded-full">${plan.totalMinutes} phút</span>
+                    </div>
+                    <h4 class="text-2xl font-black text-gray-900">${plan.title}</h4>
                 </div>
-                <div class="grid sm:grid-cols-2 gap-3 min-w-[390px]">
-                    <div class="${trackBadgeClass} border rounded-2xl px-5 py-3">
-                        <div class="text-xs font-bold uppercase mb-2">Cấp độ lộ trình</div>
-                        <select onchange="setLearningLevel(this.value)" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold outline-none">
+                <div class="grid sm:grid-cols-[minmax(0,1fr)_112px] gap-3 w-full xl:w-[360px]">
+                    <div class="${trackBadgeClass} border rounded-2xl px-4 py-3">
+                        <div class="text-xs font-black uppercase mb-2">Cấp độ</div>
+                        <select onchange="setLearningLevel(this.value)" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-black outline-none">
                             <option value="beginner" ${plan.track.key === 'beginner' ? 'selected' : ''}>Người mới bắt đầu</option>
                             <option value="intermediate" ${plan.track.key === 'intermediate' ? 'selected' : ''}>Trung cấp</option>
                         </select>
                     </div>
-                    <div class="bg-red-50 border border-red-100 rounded-2xl px-5 py-3 min-w-[160px]">
-                        <div class="text-xs font-bold text-hanred-600 uppercase">Hoàn thành</div>
-                        <div class="text-3xl font-black text-hanred-600">${percent}%</div>
+                    <div class="bg-red-50 border border-red-100 rounded-2xl px-4 py-3">
+                        <div class="text-xs font-black text-hanred-600 uppercase">Xong</div>
+                        <div class="text-3xl font-black text-hanred-600 leading-none mt-2">${percent}%</div>
                     </div>
                 </div>
             </div>
-            <div class="h-3 bg-gray-100 rounded-full overflow-hidden mb-5"><div class="h-full bg-hanred-600 rounded-full transition-all" style="width: ${percent}%"></div></div>
-            <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="skill-meter h-2.5 bg-gray-100 rounded-full overflow-hidden mb-5"><div class="h-full bg-hanred-600 rounded-full transition-all" style="width: ${percent}%"></div></div>
+            <div class="grid md:grid-cols-3 gap-4">
                 ${plan.tasks.map((task, index) => {
                     const checked = !!state.tasks[task.id];
+                    const icon = task.id === 'dictation' ? 'fa-headphones-simple' : task.id === 'speaking' ? 'fa-microphone-lines' : 'fa-layer-group';
                     return `
-                        <div class="border ${checked ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'} rounded-2xl p-4">
-                            <div class="flex items-start justify-between gap-3 mb-3">
-                                <div>
-                                    <div class="text-xs font-bold text-gray-400 uppercase">Bước ${index + 1} - ${task.minutes} phút</div>
-                                    <div class="font-black text-gray-900">${task.label}</div>
+                        <div class="plan-step ${checked ? 'border-green-200 bg-green-50' : ''} rounded-2xl p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between gap-3 mb-4">
+                                    <span class="stat-icon ${checked ? 'bg-green-600 text-white' : 'bg-gray-50 text-gray-600'}"><i class="fa-solid ${checked ? 'fa-check' : icon}"></i></span>
+                                    <div class="text-xs font-black text-gray-400 uppercase">${task.minutes} phút</div>
                                 </div>
-                                ${checked ? '<span class="w-8 h-8 rounded-lg bg-green-600 text-white flex items-center justify-center"><i class="fa-solid fa-check text-sm"></i></span>' : ''}
+                                <div>
+                                    <div class="text-xs font-black text-gray-400 uppercase">Bước ${index + 1}</div>
+                                    <div class="font-black text-gray-900 text-lg mt-1">${task.label}</div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2 compact-copy">${task.description}</p>
                             </div>
-                            <p class="text-sm text-gray-500 min-h-[60px]">${task.description}</p>
-                            <button onclick="startDailyTask(${dayNumber}, '${task.id}')" class="mt-4 w-full ${checked ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-black'} text-white px-4 py-2 rounded-xl text-sm font-bold cursor-pointer transition">${checked ? 'Đã xong' : 'Bắt đầu'}</button>
+                            <button onclick="startDailyTask(${dayNumber}, '${task.id}')" class="mt-5 w-full ${checked ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-black'} text-white px-4 py-2.5 rounded-xl text-sm font-black cursor-pointer">${checked ? 'Đã xong' : 'Bắt đầu'}</button>
                         </div>`;
                 }).join('')}
             </div>
             <div class="mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-4">
-                <div class="text-sm text-gray-600"><b>Hoàn thành:</b> Dictation, Speaking, Forecast.</div>
-                <button id="btn-complete-day" onclick="completeLearningDay(${dayNumber})" ${doneCount < plan.tasks.length || state.completed ? 'disabled' : ''} class="px-5 py-3 rounded-xl text-sm font-bold transition ${state.completed ? 'bg-green-100 text-green-700' : doneCount < plan.tasks.length ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-hanred-600 hover:bg-hanred-700 text-white cursor-pointer'}">${state.completed ? `Đã hoàn thành ngày ${dayNumber}` : `Hoàn thành ngày ${dayNumber}`}</button>
+                <div class="text-sm text-gray-600"><b>${doneCount}/${plan.tasks.length}</b> việc đã xong</div>
+                <button id="btn-complete-day" onclick="completeLearningDay(${dayNumber})" ${doneCount < plan.tasks.length || state.completed ? 'disabled' : ''} class="px-5 py-3 rounded-xl text-sm font-black transition ${state.completed ? 'bg-green-100 text-green-700' : doneCount < plan.tasks.length ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-hanred-600 hover:bg-hanred-700 text-white cursor-pointer'}">${state.completed ? `Đã hoàn thành` : `Hoàn thành ngày ${dayNumber}`}</button>
             </div>
         </div>`;
 }
@@ -959,46 +1074,11 @@ function refreshLearningOverviewLocal() {
     const summary = document.getElementById('user-progress-summary');
     if (!summary) return;
     const data = buildLocalProgressSummary();
-    const recentHtml = data.recent_activities && data.recent_activities.length
-        ? data.recent_activities.map(item => `
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 py-3 border-b border-gray-100 last:border-b-0">
-                <div>
-                    <div class="font-bold text-gray-900">${item.title}</div>
-                    <div class="text-xs text-gray-500">${item.type} - ${formatActivityDate(item.created_at)}</div>
-                </div>
-                <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold w-max">${item.score}% Accuracy</span>
-            </div>`).join('')
-        : '<p class="text-sm text-gray-400 py-4">Chưa có lịch sử.</p>';
-
-    summary.innerHTML = `
-        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6 mb-8">
-            <div class="bg-orange-50 border border-orange-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Streak học tập</div><div class="text-3xl font-black text-orange-600 leading-tight"><i class="fa-solid fa-fire mr-1"></i>${data.streak_days || 0}</div><div class="text-sm text-gray-500 mt-3">ngày liên tục</div></div>
-            <div class="bg-red-50 border border-red-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Dictation Completed</div><div class="text-3xl font-black text-hanred-600 leading-tight">${data.dictation_completed || 0}</div><div class="text-sm text-gray-500 mt-3">bài đã chép</div></div>
-            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Tổng thời gian học</div><div class="text-2xl md:text-3xl font-black text-blue-700 leading-tight">${formatStudyTime(data.total_study_minutes)}</div><div class="text-sm text-gray-500 mt-3">ước tính từ số bài hoàn thành</div></div>
-            <div class="bg-green-50 border border-green-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Accuracy Rate</div><div class="text-3xl font-black text-green-700 leading-tight">${data.avg_score || 0}%</div><div class="text-sm text-gray-500 mt-3">độ chính xác trung bình</div></div>
-        </div>
-        ${renderForecastPanel()}
-        ${renderDailyLearningPlan(data)}
-        <div class="mb-6">
-            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <div class="text-xs font-bold text-purple-600 uppercase mb-4">Bản đồ kỹ năng</div>
-                <div class="space-y-4">
-                    ${skillBar('Chép chính tả', data.dictation_avg || data.avg_score || 0, 'bg-hanred-600')}
-                    ${skillBar('Phát âm', data.speaking_avg || 0, 'bg-blue-600')}
-                    ${skillBar('Từ vựng Forecast', getVocabularyProgressPercent(), 'bg-purple-600')}
-                </div>
-            </div>
-        </div>
-        <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between gap-4 mb-3">
-                <div>
-                    <div class="text-xs font-bold text-gray-500 uppercase">Activity Log</div>
-                    <h4 class="text-xl font-black text-gray-900">Nhật ký học tập gần đây</h4>
-                </div>
-                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">Ngày lộ trình ${getCurrentPlanDay(data.learning_day)}</span>
-            </div>
-            ${recentHtml}
-        </div>`;
+    summary.innerHTML = renderLearningOverviewDashboard(
+        data,
+        null,
+        `Ngày ${getCurrentPlanDay(data.learning_day)}`
+    );
 }
 
 async function loadMyProgress() {
@@ -1017,46 +1097,11 @@ async function loadMyProgress() {
         syncAccountSettingsForm();
     }
     const renderProgressDashboard = (data, forecast = null) => {
-        const recentHtml = data.recent_activities && data.recent_activities.length
-            ? data.recent_activities.map(item => `
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 py-3 border-b border-gray-100 last:border-b-0">
-                    <div>
-                        <div class="font-bold text-gray-900">${item.title}</div>
-                        <div class="text-xs text-gray-500">${item.type} - ${formatActivityDate(item.created_at)}</div>
-                    </div>
-                    <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold w-max">${item.score}% Accuracy</span>
-                </div>`).join('')
-            : '<p class="text-sm text-gray-400 py-4">Chưa có lịch sử.</p>';
-
-        summary.innerHTML = `
-            <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6 mb-8">
-                <div class="bg-orange-50 border border-orange-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Streak học tập</div><div class="text-3xl font-black text-orange-600 leading-tight"><i class="fa-solid fa-fire mr-1"></i>${data.streak_days || 0}</div><div class="text-sm text-gray-500 mt-3">ngày liên tục</div></div>
-                <div class="bg-red-50 border border-red-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Dictation Completed</div><div class="text-3xl font-black text-hanred-600 leading-tight">${data.dictation_completed || 0}</div><div class="text-sm text-gray-500 mt-3">bài đã chép</div></div>
-                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Tổng thời gian học</div><div class="text-2xl md:text-3xl font-black text-blue-700 leading-tight">${formatStudyTime(data.total_study_minutes)}</div><div class="text-sm text-gray-500 mt-3">ước tính từ số bài hoàn thành</div></div>
-                <div class="bg-green-50 border border-green-100 rounded-2xl p-5 md:p-6 shadow-sm min-h-[132px]"><div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-2">Accuracy Rate</div><div class="text-3xl font-black text-green-700 leading-tight">${data.avg_score || 0}%</div><div class="text-sm text-gray-500 mt-3">độ chính xác trung bình</div></div>
-            </div>
-            ${renderForecastPanel(forecast)}
-            ${renderDailyLearningPlan(data)}
-            <div class="mb-6">
-                <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                    <div class="text-xs font-bold text-purple-600 uppercase mb-4">Bản đồ kỹ năng</div>
-                    <div class="space-y-4">
-                        ${skillBar('Chép chính tả', data.dictation_avg || data.avg_score || 0, 'bg-hanred-600')}
-                        ${skillBar('Phát âm', data.speaking_avg || 0, 'bg-blue-600')}
-                        ${skillBar('Từ vựng Forecast', getVocabularyProgressPercent(), 'bg-purple-600')}
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <div class="flex items-center justify-between gap-4 mb-3">
-                    <div>
-                        <div class="text-xs font-bold text-gray-500 uppercase">Activity Log</div>
-                        <h4 class="text-xl font-black text-gray-900">Nhật ký học tập gần đây</h4>
-                    </div>
-                    <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">Ngày học ${data.learning_day} - ${data.stage}</span>
-                </div>
-                ${recentHtml}
-            </div>`;
+        summary.innerHTML = renderLearningOverviewDashboard(
+            data,
+            forecast,
+            `Ngày ${data.learning_day} · ${data.stage}`
+        );
         table.innerHTML = data.monthly.length ? data.monthly.map(m => `
             <tr>
                 <td class="py-3 px-4 font-bold">${m.month}</td>
@@ -1396,7 +1441,7 @@ function scrollToSection(sectionId) {
 
 function setSideNavActive(buttons, activeButton, activeClasses) {
     buttons.forEach(btn => {
-        btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-600', 'bg-red-50', 'text-hanred-700', 'border-hanred-600', 'border-r-4');
+        btn.classList.remove('sidebar-pulse', 'bg-blue-50', 'text-blue-700', 'border-blue-600', 'bg-red-50', 'text-hanred-700', 'border-hanred-600', 'border-r-4');
         btn.classList.add('hover:bg-gray-50', 'text-gray-600');
         btn.querySelector('i')?.classList.add('text-gray-400');
     });
@@ -1420,7 +1465,7 @@ function switchUserPanel(panelId) {
     document.getElementById(panelId)?.classList.remove('hidden');
     const buttons = document.querySelectorAll('.user-nav-btn');
     const activeButton = document.querySelector(`[data-user-nav="${panelId}"]`);
-    setSideNavActive(buttons, activeButton, ['bg-red-50', 'text-hanred-700', 'border-r-4', 'border-hanred-600']);
+    setSideNavActive(buttons, activeButton, ['sidebar-pulse', 'bg-red-50', 'text-hanred-700', 'border-r-4', 'border-hanred-600']);
     if (panelId === 'user-vocabulary-section') VocabularyUI.load();
 }
 
@@ -1434,8 +1479,8 @@ function toggleLearningSidebar() {
         ? 'grid lg:grid-cols-[76px_minmax(0,1fr)] gap-6 items-start transition-all duration-300'
         : 'grid lg:grid-cols-[250px_minmax(0,1fr)] gap-6 items-start transition-all duration-300';
     sidebar.className = isCollapsed
-        ? 'relative bg-white border border-gray-200 rounded-2xl shadow-sm p-3 lg:sticky lg:top-24 min-h-[calc(100vh-130px)] transition-all duration-300 overflow-visible is-collapsed'
-        : 'relative bg-white border border-gray-200 rounded-2xl shadow-sm p-4 lg:sticky lg:top-24 min-h-[calc(100vh-130px)] transition-all duration-300 overflow-visible';
+        ? 'relative learning-shell rounded-2xl p-3 lg:sticky lg:top-24 min-h-[calc(100vh-130px)] transition-all duration-300 overflow-visible is-collapsed'
+        : 'relative learning-shell rounded-2xl p-4 lg:sticky lg:top-24 min-h-[calc(100vh-130px)] transition-all duration-300 overflow-visible';
     if (edgeIcon) {
         edgeIcon.className = isCollapsed ? 'fa-solid fa-angle-right' : 'fa-solid fa-angle-left';
     }
