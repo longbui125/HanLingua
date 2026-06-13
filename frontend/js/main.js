@@ -694,7 +694,7 @@ function initMotionReveal() {
             else if (el.classList.contains('motion-pop')) el.classList.add('motion-pop');
             else el.classList.add(index % 3 === 0 ? 'motion-from-left' : index % 3 === 1 ? 'motion-from-right' : 'motion-from-bottom');
         }
-        el.style.setProperty('--reveal-delay', `${Math.min((index % 6) * 70, 350)}ms`);
+        el.style.setProperty('--reveal-delay', `${Math.min((index % 5) * 45, 180)}ms`);
         el.classList.add('reveal-on-scroll', 'scroll-motion-ready');
         window.hanRevealObserver.observe(el);
     });
@@ -731,9 +731,9 @@ function updateScrollLinkedMotion() {
         const progress = Math.max(-1, Math.min(1, centerOffset));
         const direction = index % 2 === 0 ? 1 : -1;
         const isTextHeavy = el.classList.contains('overview-mini-stat') || el.classList.contains('quest-card');
-        const lift = isTextHeavy ? 6 : el.classList.contains('cozy-side-card') ? 14 : 10;
-        const drift = isTextHeavy ? 0 : 4;
-        const rotate = isTextHeavy ? 0 : -progress * direction * 0.22;
+        const lift = isTextHeavy ? 3 : el.classList.contains('cozy-side-card') ? 7 : 5;
+        const drift = isTextHeavy ? 0 : 2;
+        const rotate = isTextHeavy ? 0 : -progress * direction * 0.08;
 
         el.style.setProperty('--scroll-y', `${Math.round(-progress * lift)}px`);
         el.style.setProperty('--scroll-x', `${Math.round(progress * direction * drift)}px`);
