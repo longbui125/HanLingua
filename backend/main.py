@@ -264,7 +264,7 @@ def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = No
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
     )
     opts = {
-        "format": "bestaudio[ext=m4a]/bestaudio/best",
+        "format": "bestaudio[acodec!=none]/best[acodec!=none]/best",
         "outtmpl": output_template,
         "noplaylist": True,
         "retries": 5,
@@ -277,7 +277,7 @@ def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = No
             "Accept-Language": "en-US,en;q=0.9",
         },
         "extractor_args": {
-            "youtube": {"player_client": ["android", "web"]},
+            "youtube": {"player_client": ["web", "android", "ios"]},
         },
         "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "m4a"}],
     }
