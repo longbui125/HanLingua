@@ -914,8 +914,8 @@ function renderLearningOverviewDashboardV3(data, forecast = null, badgeText = ''
             <section class="overview-metrics-panel motion-bottom">
                 <div class="overview-section-head">
                     <div>
-                        <div class="text-xs font-black text-orange-700 uppercase">Tiến độ gọn</div>
-                        <h4 class="text-xl md:text-2xl font-black text-gray-950 mt-1">Nhìn nhanh, không bị ngợp.</h4>
+                        <div class="text-xs font-black text-orange-700 uppercase">Tiến độ học tập</div>
+                        <h4 class="text-xl md:text-2xl font-black text-gray-950 mt-1">Tiến độ hôm nay.</h4>
                     </div>
                 </div>
                 ${renderOverviewStats(data)}
