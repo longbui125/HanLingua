@@ -570,12 +570,14 @@ function updateScrollLinkedMotion() {
         const centerOffset = ((rect.top + rect.height / 2) - viewportHeight / 2) / viewportHeight;
         const progress = Math.max(-1, Math.min(1, centerOffset));
         const direction = index % 2 === 0 ? 1 : -1;
-        const lift = el.classList.contains('quest-card') ? 8 : el.classList.contains('cozy-side-card') ? 16 : 12;
-        const drift = el.classList.contains('overview-mini-stat') ? 3 : 6;
+        const isTextHeavy = el.classList.contains('overview-mini-stat') || el.classList.contains('quest-card');
+        const lift = isTextHeavy ? 6 : el.classList.contains('cozy-side-card') ? 14 : 10;
+        const drift = isTextHeavy ? 0 : 4;
+        const rotate = isTextHeavy ? 0 : -progress * direction * 0.22;
 
-        el.style.setProperty('--scroll-y', `${(-progress * lift).toFixed(2)}px`);
-        el.style.setProperty('--scroll-x', `${(progress * direction * drift).toFixed(2)}px`);
-        el.style.setProperty('--scroll-rotate', `${(-progress * direction * 0.35).toFixed(3)}deg`);
+        el.style.setProperty('--scroll-y', `${Math.round(-progress * lift)}px`);
+        el.style.setProperty('--scroll-x', `${Math.round(progress * direction * drift)}px`);
+        el.style.setProperty('--scroll-rotate', `${rotate.toFixed(3)}deg`);
     });
 }
 
