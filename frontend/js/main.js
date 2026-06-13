@@ -182,6 +182,7 @@ const AuthUI = {
                 <button onclick="AuthUI.openModal(true)" class="hidden md:block text-gray-600 font-medium hover:text-hanred-600 transition cursor-pointer">Đăng nhập</button>
                 <button onclick="AuthUI.openModal(false)" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-2.5 rounded-lg font-black transition shadow-md cursor-pointer">Bắt đầu ngay</button>`;
         }
+        updateLandingAuthActions();
     },
 
     logout() {
@@ -189,6 +190,13 @@ const AuthUI = {
         location.reload();
     }
 };
+
+function updateLandingAuthActions() {
+    const registerCta = document.getElementById('landing-register-cta');
+    if (registerCta) {
+        registerCta.classList.toggle('hidden', !!currentUser);
+    }
+}
 
 function showWelcomeModal(custom = null) {
     const modal = document.getElementById('welcome-modal');
