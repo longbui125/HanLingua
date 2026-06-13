@@ -258,13 +258,21 @@ def build_ytdlp_cookiefile():
         cookie_temp.close()
 
 
-def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = None):
+YTDLP_FORMAT_FALLBACKS = [
+    "bestaudio/best",
+    "best[acodec!=none]/best",
+    "best",
+    "worst[acodec!=none]/worst",
+]
+
+
+def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = None, format_selector: Optional[str] = None):
     user_agent = os.environ.get(
         "YTDLP_USER_AGENT",
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
     )
     opts = {
-        "format": "bestaudio[acodec!=none]/best[acodec!=none]/best",
+        "format": format_selector or YTDLP_FORMAT_FALLBACKS[0],
         "outtmpl": output_template,
         "noplaylist": True,
         "retries": 5,
@@ -284,6 +292,34 @@ def get_ytdlp_audio_options(output_template: str, cookiefile: Optional[str] = No
     if cookiefile:
         opts["cookiefile"] = cookiefile
     return opts
+
+
+def cleanup_ytdlp_outputs(output_template: str):
+    for candidate in glob.glob(f"{output_template}*"):
+        if os.path.isfile(candidate):
+            try:
+                os.remove(candidate)
+            except OSError:
+                pass
+
+
+def download_with_ytdlp_fallbacks(url: str, output_template: str, cookiefile: Optional[str] = None):
+    format_errors = []
+    for index, format_selector in enumerate(YTDLP_FORMAT_FALLBACKS):
+        if index:
+            cleanup_ytdlp_outputs(output_template)
+        try:
+            with yt_dlp.YoutubeDL(get_ytdlp_audio_options(output_template, cookiefile, format_selector)) as ydl:
+                ydl.download([url.strip()])
+            return
+        except Exception as exc:
+            message = str(exc).splitlines()[-1] if str(exc) else repr(exc)
+            if "requested format is not available" not in message.lower():
+                raise
+            format_errors.append(f"{format_selector}: {message}")
+
+    details = " | ".join(format_errors[-3:])
+    raise RuntimeError(f"YouTube không trả về format audio phù hợp cho server. Chi tiết: {details}")
 
 
 def build_youtube_download_error(message: str) -> str:
@@ -319,8 +355,7 @@ def download_youtube_audio(url: str, output_template: str) -> str:
 
     cookiefile, cookiefile_to_cleanup = build_ytdlp_cookiefile()
     try:
-        with yt_dlp.YoutubeDL(get_ytdlp_audio_options(output_template, cookiefile)) as ydl:
-            ydl.download([url.strip()])
+        download_with_ytdlp_fallbacks(url, output_template, cookiefile)
     except HTTPException:
         raise
     except Exception as exc:
@@ -762,12 +797,10 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
     filename_base = f"lesson_{int(datetime.datetime.utcnow().timestamp())}"
     output_template = os.path.join(DATA_DIR, filename_base)
     cookiefile, cookiefile_to_cleanup = build_ytdlp_cookiefile()
-    ydl_opts = get_ytdlp_audio_options(output_template, cookiefile)
 
     audio_path = f"{output_template}.m4a"
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([req.source_url])
+        download_with_ytdlp_fallbacks(req.source_url, output_template, cookiefile)
         transcript = generate_transcript_json(audio_path)
     except Exception as exc:
         if os.path.exists(audio_path):
