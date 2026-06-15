@@ -243,7 +243,7 @@ const AuthUI = {
                 data = await API.register(user, pass);
                 showWelcomeModal({
                     title: 'Chào mừng bạn đến với HanLingua',
-                    message: data.msg || 'Tài khoản đã sẵn sàng. Bạn có 5 ngày dùng thử.',
+                    message: data.msg || 'Tài khoản đã sẵn sàng. Bạn có 7 ngày dùng thử.',
                     icon: 'fa-heart'
                 });
                 this.toggleMode();
@@ -583,7 +583,7 @@ function renderReviewsModal() {
     const average = totalReviews ? (totalStars / totalReviews).toFixed(1) : '0.0';
 
     modalSummary.innerText = totalReviews
-        ? `${totalReviews.toLocaleString('vi-VN')} đánh giá · ${totalStars.toLocaleString('vi-VN')} sao · trung bình ${average}/5`
+        ? `${totalReviews.toLocaleString('vi-VN')} đánh giá · trung bình ${average}/5 sao`
         : 'Chưa có đánh giá nào.';
 
     modalList.innerHTML = totalReviews
@@ -624,12 +624,11 @@ function renderReviews(data = {}) {
     reviewsCache = items;
     const average = Number(data.average_rating || 0);
     const totalReviews = Number(data.total_reviews || 0);
-    const totalStars = Number(data.total_stars || 0);
 
     averageEl.innerText = totalReviews ? average.toFixed(1) : '0.0';
     starsEl.innerHTML = reviewStarsMarkup(average);
     totalCountEl.innerText = totalReviews.toLocaleString('vi-VN');
-    totalStarsEl.innerText = totalStars.toLocaleString('vi-VN');
+    totalStarsEl.innerText = totalReviews ? average.toFixed(1) : '0.0';
 
     if (!items.length) {
         if (viewAllBtn) viewAllBtn.classList.add('hidden');
