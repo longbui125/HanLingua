@@ -1,5 +1,6 @@
 let currentUser = null;
 let avatarCacheKey = Date.now();
+let reviewsCache = [];
 let tabState = {
     currentLessonId: null,
     currentLevel: 1,
@@ -7,7 +8,7 @@ let tabState = {
     aiData: { transcript: "", audioB64: "" }
 };
 let currentPayment = null;
-let selectedReviewRating = 5;
+let selectedReviewRating = null;
 
 const VIEW_ROUTES = {
     'view-landing': '/',
@@ -528,8 +529,9 @@ function renderReviewFormState() {
     const submitBtn = document.getElementById('review-submit-btn');
     if (ratingInput) {
         ratingInput.querySelectorAll('button').forEach((btn, index) => {
-            btn.classList.toggle('is-active', index < selectedReviewRating);
-            btn.setAttribute('aria-checked', index + 1 === selectedReviewRating ? 'true' : 'false');
+            const hasRating = Number.isInteger(selectedReviewRating);
+            btn.classList.toggle('is-active', hasRating && index < selectedReviewRating);
+            btn.setAttribute('aria-checked', hasRating && index + 1 === selectedReviewRating ? 'true' : 'false');
         });
     }
     if (status) {
@@ -543,20 +545,22 @@ function renderReviewFormState() {
 }
 
 function setReviewRating(rating) {
-    selectedReviewRating = Math.max(1, Math.min(5, Number(rating) || 5));
+    const ratingValue = Number(rating);
+    selectedReviewRating = ratingValue >= 1 && ratingValue <= 5 ? ratingValue : null;
     renderReviewFormState();
 }
 
-function renderReviewCard(review) {
+function renderReviewCard(review, extraClass = '') {
     const username = review.username || 'HanLingua learner';
     const initial = username.charAt(0).toUpperCase();
     const date = review.updated_at || review.created_at;
     const dateText = date ? new Date(date).toLocaleDateString('vi-VN') : 'Gần đây';
+    const commentText = review.comment || 'Người học đã để lại đánh giá bằng sao cho HanLingua.';
     const avatar = review.avatar_url
         ? `<img src="${resolveAssetUrl(review.avatar_url)}" alt="${escapeHtml(username)}">`
         : `<span>${escapeHtml(initial)}</span>`;
     return `
-        <article class="review-card motion-card">
+        <article class="review-card motion-card ${extraClass}">
             <div class="review-card-head">
                 <div class="review-avatar">${avatar}</div>
                 <div>
@@ -565,8 +569,46 @@ function renderReviewCard(review) {
                 </div>
             </div>
             <div class="review-card-stars">${reviewStarsMarkup(review.rating)}</div>
-            <p>${escapeHtml(review.comment || '')}</p>
+            <p>${escapeHtml(commentText)}</p>
         </article>`;
+}
+
+function renderReviewsModal() {
+    const modalList = document.getElementById('reviews-modal-list');
+    const modalSummary = document.getElementById('reviews-modal-summary');
+    if (!modalList || !modalSummary) return;
+
+    const totalReviews = reviewsCache.length;
+    const totalStars = reviewsCache.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+    const average = totalReviews ? (totalStars / totalReviews).toFixed(1) : '0.0';
+
+    modalSummary.innerText = totalReviews
+        ? `${totalReviews.toLocaleString('vi-VN')} đánh giá · ${totalStars.toLocaleString('vi-VN')} sao · trung bình ${average}/5`
+        : 'Chưa có đánh giá nào.';
+
+    modalList.innerHTML = totalReviews
+        ? reviewsCache.map(review => renderReviewCard(review, 'review-card--modal')).join('')
+        : `
+            <div class="review-empty-state">
+                <i class="fa-solid fa-star"></i>
+                <b>Chưa có nhận xét nào</b>
+                <span>Hãy là người đầu tiên để lại cảm nhận về HanLingua.</span>
+            </div>`;
+}
+
+function openReviewsModal() {
+    renderReviewsModal();
+    document.getElementById('reviews-modal')?.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+}
+
+function closeReviewsModal() {
+    document.getElementById('reviews-modal')?.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+}
+
+function handleReviewsModalBackdrop(event) {
+    if (event.target?.id === 'reviews-modal') closeReviewsModal();
 }
 
 function renderReviews(data = {}) {
@@ -575,9 +617,11 @@ function renderReviews(data = {}) {
     const totalCountEl = document.getElementById('reviews-total-count');
     const totalStarsEl = document.getElementById('reviews-total-stars');
     const listEl = document.getElementById('reviews-list');
+    const viewAllBtn = document.getElementById('reviews-view-all-btn');
     if (!averageEl || !starsEl || !totalCountEl || !totalStarsEl || !listEl) return;
 
     const items = Array.isArray(data.items) ? data.items : [];
+    reviewsCache = items;
     const average = Number(data.average_rating || 0);
     const totalReviews = Number(data.total_reviews || 0);
     const totalStars = Number(data.total_stars || 0);
@@ -588,6 +632,7 @@ function renderReviews(data = {}) {
     totalStarsEl.innerText = totalStars.toLocaleString('vi-VN');
 
     if (!items.length) {
+        if (viewAllBtn) viewAllBtn.classList.add('hidden');
         listEl.innerHTML = `
             <div class="review-empty-state">
                 <i class="fa-solid fa-star"></i>
@@ -597,7 +642,13 @@ function renderReviews(data = {}) {
         return;
     }
 
-    listEl.innerHTML = items.slice(0, 6).map(renderReviewCard).join('');
+    const previewItems = items.slice(0, 6);
+    listEl.innerHTML = previewItems.map(review => renderReviewCard(review)).join('');
+    if (viewAllBtn) {
+        viewAllBtn.classList.toggle('hidden', items.length <= previewItems.length);
+        viewAllBtn.innerHTML = `Xem tất cả ${totalReviews.toLocaleString('vi-VN')} đánh giá <i class="fa-solid fa-arrow-right"></i>`;
+    }
+    renderReviewsModal();
     setTimeout(initMotionReveal, 40);
 }
 
@@ -608,6 +659,8 @@ async function loadReviews() {
         renderReviews(data);
     } catch (e) {
         const listEl = document.getElementById('reviews-list');
+        const viewAllBtn = document.getElementById('reviews-view-all-btn');
+        if (viewAllBtn) viewAllBtn.classList.add('hidden');
         if (listEl) {
             listEl.innerHTML = `
                 <div class="review-empty-state">
@@ -630,8 +683,8 @@ async function submitReview(event) {
     const status = document.getElementById('review-form-status');
     const submitBtn = document.getElementById('review-submit-btn');
     const comment = (commentEl?.value || '').trim();
-    if (comment.length < 8) {
-        if (status) status.innerText = 'Nhận xét cần ít nhất 8 ký tự.';
+    if (!Number.isInteger(selectedReviewRating)) {
+        if (status) status.innerText = 'Vui lòng chọn số sao trước khi gửi đánh giá.';
         return;
     }
 
@@ -640,6 +693,7 @@ async function submitReview(event) {
         if (status) status.innerText = 'Đang gửi đánh giá...';
         const res = await API.createReview(selectedReviewRating, comment);
         if (commentEl) commentEl.value = '';
+        selectedReviewRating = null;
         await loadReviews();
         if (status) status.innerText = res.msg || 'Đã gửi đánh giá. Cảm ơn bạn!';
     } catch (e) {
@@ -2413,8 +2467,20 @@ function closePaymentModal() {
     document.getElementById('payment-modal').classList.add('hidden');
 }
 
+Object.assign(window, {
+    openReviewsModal,
+    closeReviewsModal,
+    handleReviewsModalBackdrop,
+    setReviewRating,
+    submitReview
+});
+
 window.addEventListener('popstate', () => {
     applyRouteFromLocation();
+});
+
+window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeReviewsModal();
 });
 
 AuthUI.init();

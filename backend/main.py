@@ -541,7 +541,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 @app.get("/api/reviews")
 def list_reviews(db: Session = Depends(get_db)):
-    reviews = db.query(models.Review).order_by(models.Review.updated_at.desc(), models.Review.created_at.desc()).limit(12).all()
+    reviews = db.query(models.Review).order_by(models.Review.updated_at.desc(), models.Review.created_at.desc()).all()
     total_reviews = db.query(models.Review).count()
     total_stars = sum(row[0] or 0 for row in db.query(models.Review.rating).all())
     average_rating = round(total_stars / total_reviews, 1) if total_reviews else 0.0
@@ -556,10 +556,13 @@ def list_reviews(db: Session = Depends(get_db)):
 @app.post("/api/reviews")
 def create_review(req: ReviewCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     require_approved_user(current_user)
-    rating = max(1, min(5, int(req.rating or 5)))
+    try:
+        rating = int(req.rating)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="Vui lòng chọn số sao trước khi gửi đánh giá.")
+    if rating < 1 or rating > 5:
+        raise HTTPException(status_code=400, detail="Số sao phải nằm trong khoảng 1 đến 5.")
     comment = (req.comment or "").strip()
-    if len(comment) < 8:
-        raise HTTPException(status_code=400, detail="Nhận xét cần ít nhất 8 ký tự.")
     if len(comment) > 420:
         raise HTTPException(status_code=400, detail="Nhận xét tối đa 420 ký tự.")
 

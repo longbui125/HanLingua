@@ -48,7 +48,7 @@ class PaymentCreate(BaseModel):
 
 
 class ReviewCreate(BaseModel):
-    rating: int
+    rating: Optional[int] = None
     comment: Optional[str] = ""
 
 

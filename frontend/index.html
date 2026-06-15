@@ -459,8 +459,14 @@
                     </div>
 
                     <div class="reviews-layout">
-                        <div class="reviews-list" id="reviews-list">
-                            <div class="review-card is-placeholder">Đang tải nhận xét...</div>
+                        <div class="reviews-preview">
+                            <div class="reviews-list" id="reviews-list">
+                                <div class="review-card is-placeholder">Đang tải nhận xét...</div>
+                            </div>
+                            <button id="reviews-view-all-btn" type="button" onclick="openReviewsModal()" class="reviews-view-all-btn hidden">
+                                Xem tất cả đánh giá
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
                         </div>
 
                         <form class="review-form" onsubmit="submitReview(event)">
@@ -1464,6 +1470,22 @@
             </div>
             </div>
         </div>
+
+    <div id="reviews-modal" class="reviews-modal hidden" onclick="handleReviewsModalBackdrop(event)">
+        <div class="reviews-modal-panel" role="dialog" aria-modal="true" aria-labelledby="reviews-modal-title">
+            <div class="reviews-modal-head">
+                <div>
+                    <div class="text-xs font-black text-hanred-600 uppercase">Tất cả nhận xét</div>
+                    <h2 id="reviews-modal-title">Đánh giá từ người học</h2>
+                    <p id="reviews-modal-summary">Đang tải đánh giá...</p>
+                </div>
+                <button type="button" onclick="closeReviewsModal()" aria-label="Đóng đánh giá">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="reviews-modal-list" class="reviews-modal-list"></div>
+        </div>
+    </div>
 
     <div id="payment-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[100] hidden flex items-center justify-center backdrop-blur-sm transition-all duration-300 px-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
