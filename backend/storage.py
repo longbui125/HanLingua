@@ -28,7 +28,8 @@ def upload_public_file(path, content, content_type):
     safe_path = "/".join(quote(part) for part in path.strip("/").split("/"))
     url = f"{SUPABASE_URL}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{safe_path}"
     response = requests.post(url, headers=_headers(content_type), data=content, timeout=120)
-    response.raise_for_status()
+    if not response.ok:
+        raise RuntimeError(f"Supabase Storage upload failed ({response.status_code}): {response.text[:500]}")
     return f"{SUPABASE_URL}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/{safe_path}"
 
 

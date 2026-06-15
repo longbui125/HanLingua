@@ -83,13 +83,27 @@ def convert_media_to_mp3(input_path: str) -> str:
 
 
 # CORS: allow frontend origin from env, defaults to allow all.
+DEFAULT_CORS_ORIGINS = [
+    "https://han-lingua.vercel.app",
+    "https://hanlingua.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8000",
+]
+
+
 def parse_cors_origins():
     origins = [
         origin.strip().rstrip("/")
         for origin in os.environ.get("CORS_ORIGINS", "*").split(",")
         if origin.strip()
     ]
-    return origins or ["*"]
+    if not origins or "*" in origins:
+        return ["*"]
+    return list(dict.fromkeys(origins + DEFAULT_CORS_ORIGINS))
 
 
 CORS_ORIGINS = parse_cors_origins()
@@ -855,15 +869,21 @@ async def upload_audio(file: UploadFile = File(...), current_user: models.User =
     timestamp = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
     filename = f"{timestamp}_{safe_stem}{ext}"
     upload_content_type = content_type if content_type.startswith("audio/") else "application/octet-stream"
-    if is_supabase_storage_enabled():
-        audio_url = upload_public_file(f"lesson_audio/{filename}", content, upload_content_type)
-        return {"url": audio_url, "content_type": upload_content_type}
-    audio_dir = os.path.join(DATA_DIR, "lesson_audio")
-    os.makedirs(audio_dir, exist_ok=True)
-    file_path = os.path.join(audio_dir, filename)
-    with open(file_path, "wb") as buffer:
-        buffer.write(content)
-    return {"url": f"/data/lesson_audio/{filename}", "content_type": upload_content_type}
+    try:
+        if is_supabase_storage_enabled():
+            audio_url = upload_public_file(f"lesson_audio/{filename}", content, upload_content_type)
+            return {"url": audio_url, "content_type": upload_content_type}
+        audio_dir = os.path.join(DATA_DIR, "lesson_audio")
+        os.makedirs(audio_dir, exist_ok=True)
+        file_path = os.path.join(audio_dir, filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+        return {"url": f"/data/lesson_audio/{filename}", "content_type": upload_content_type}
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Khong the luu file audio. Kiem tra Supabase Storage/Railway. Chi tiet: {exc}",
+        ) from exc
 
 @app.post("/api/admin/lessons")
 def create_lesson(req: LessonCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):

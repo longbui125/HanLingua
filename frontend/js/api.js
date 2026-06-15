@@ -371,11 +371,16 @@ const API = {
     },
 
     async uploadAudio(formData) {
-        const res = await fetch(`${API_BASE}/admin/upload-audio`, {
-            method: 'POST',
-            headers: getAuthOnlyHeaders(),
-            body: formData 
-        });
+        let res;
+        try {
+            res = await fetch(`${API_BASE}/admin/upload-audio`, {
+                method: 'POST',
+                headers: getAuthOnlyHeaders(),
+                body: formData
+            });
+        } catch (e) {
+            throw new Error(`Khong ket noi duoc backend upload audio (${API_BASE}). Kiem tra Railway dang online, CORS_ORIGINS co ${window.location.origin}, va backend da deploy ban moi.`);
+        }
         if (!res.ok) throw await apiError(res, "Không thể tải lên file");
         return res.json();
     },
