@@ -20,7 +20,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="css/style.css?v=20260613-21">
+    <link rel="stylesheet" href="css/style.css?v=20260615-01">
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -437,6 +437,52 @@
                         <div class="w-11 h-11 bg-white border border-gray-200 text-hanred-600 rounded-lg flex items-center justify-center text-lg font-black mb-5 relative z-10">3</div>
                         <h4 class="text-xl font-black text-gray-950 mb-2">Học và cải thiện</h4>
                         <p class="text-gray-600 text-sm">Chép, nói, ôn từ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="reviews" class="landing-reviews-section py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="reviews-shell motion-bottom">
+                    <div class="reviews-heading">
+                        <div>
+                            <div class="text-xs font-black text-hanred-600 uppercase mb-3">Đánh giá từ người học</div>
+                            <h2 class="text-3xl md:text-5xl font-black text-gray-950 leading-tight">Mọi người đang học cùng HanLingua thế nào?</h2>
+                            <p class="text-gray-600 mt-4 max-w-2xl">Những nhận xét ngắn, thật và dễ đọc từ cộng đồng học tiếng Hàn mỗi ngày.</p>
+                        </div>
+                        <div class="reviews-score-card" aria-live="polite">
+                            <div class="reviews-score-number" id="reviews-average">0.0</div>
+                            <div class="reviews-stars" id="reviews-average-stars" aria-label="Điểm đánh giá trung bình">☆☆☆☆☆</div>
+                            <div class="reviews-score-meta"><span id="reviews-total-count">0</span> đánh giá · <span id="reviews-total-stars">0</span> sao</div>
+                        </div>
+                    </div>
+
+                    <div class="reviews-layout">
+                        <div class="reviews-list" id="reviews-list">
+                            <div class="review-card is-placeholder">Đang tải nhận xét...</div>
+                        </div>
+
+                        <form class="review-form" onsubmit="submitReview(event)">
+                            <div class="review-form-top">
+                                <div>
+                                    <div class="text-xs font-black text-hanred-600 uppercase">Gửi cảm nhận</div>
+                                    <h3 class="text-2xl font-black text-gray-950">Bạn thấy HanLingua thế nào?</h3>
+                                </div>
+                                <div class="review-rating-input" id="review-rating-input" role="radiogroup" aria-label="Chọn số sao">
+                                    <button type="button" onclick="setReviewRating(1)" aria-label="1 sao">★</button>
+                                    <button type="button" onclick="setReviewRating(2)" aria-label="2 sao">★</button>
+                                    <button type="button" onclick="setReviewRating(3)" aria-label="3 sao">★</button>
+                                    <button type="button" onclick="setReviewRating(4)" aria-label="4 sao">★</button>
+                                    <button type="button" onclick="setReviewRating(5)" aria-label="5 sao">★</button>
+                                </div>
+                            </div>
+                            <textarea id="review-comment" maxlength="420" rows="5" placeholder="Viết vài dòng nhận xét: phần nào giúp bạn học dễ hơn, trải nghiệm có mượt không..."></textarea>
+                            <div class="review-form-footer">
+                                <span id="review-form-status">Đăng nhập để gửi đánh giá của bạn.</span>
+                                <button id="review-submit-btn" type="submit" class="review-submit-btn">Gửi đánh giá</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -1514,12 +1560,12 @@
         window.HANLINGUA_API_URL = 'https://hanlingua-production.up.railway.app';
     </script>
 
-    <script src="js/api.js?v=20260601-05"></script>
+    <script src="js/api.js?v=20260615-01"></script>
     <script src="js/utils.js?v=20260601-04"></script>
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260601-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260613-21"></script>
+    <script src="js/main.js?v=20260615-01"></script>
 
     <script>
         window.onload = () => { 

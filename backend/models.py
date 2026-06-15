@@ -18,6 +18,7 @@ class User(Base):
     progress = relationship("UserProgress", back_populates="owner")
     payments = relationship("Payment", back_populates="user")
     vocabulary_items = relationship("Vocabulary", back_populates="owner")
+    reviews = relationship("Review", back_populates="user")
 
 class Lesson(Base):
     __tablename__ = "lessons"
@@ -70,3 +71,14 @@ class Vocabulary(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     owner = relationship("User", back_populates="vocabulary_items")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    rating = Column(Integer, default=5)
+    comment = Column(Text)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    user = relationship("User", back_populates="reviews")

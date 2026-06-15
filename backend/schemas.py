@@ -47,6 +47,11 @@ class PaymentCreate(BaseModel):
     note: str
 
 
+class ReviewCreate(BaseModel):
+    rating: int
+    comment: Optional[str] = ""
+
+
 class AccountStatusUpdate(BaseModel):
     status: str
 

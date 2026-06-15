@@ -386,6 +386,19 @@ def username_suggestions(db: Session, username: str, limit: int = 3):
             break
     return suggestions
 
+
+def serialize_review(review: models.Review):
+    username = review.user.username if review.user else "HanLingua learner"
+    return {
+        "id": review.id,
+        "username": username,
+        "avatar_url": review.user.avatar_url if review.user else None,
+        "rating": review.rating,
+        "comment": review.comment,
+        "created_at": review.created_at.isoformat() if review.created_at else None,
+        "updated_at": review.updated_at.isoformat() if review.updated_at else None,
+    }
+
 HANGUL_BASE = 0xAC00
 HANGUL_END = 0xD7A3
 CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"]
@@ -525,6 +538,44 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if user.account_status in {"rejected", "locked"}:
         raise HTTPException(status_code=403, detail="Tài khoản của bạn đã bị từ chối hoặc bị khóa.")
     return {"access_token": auth.create_access_token({"sub": user.username}), "token_type": "bearer", "role": user.role}
+
+@app.get("/api/reviews")
+def list_reviews(db: Session = Depends(get_db)):
+    reviews = db.query(models.Review).order_by(models.Review.updated_at.desc(), models.Review.created_at.desc()).limit(12).all()
+    total_reviews = db.query(models.Review).count()
+    total_stars = sum(row[0] or 0 for row in db.query(models.Review.rating).all())
+    average_rating = round(total_stars / total_reviews, 1) if total_reviews else 0.0
+    return {
+        "average_rating": average_rating,
+        "total_reviews": total_reviews,
+        "total_stars": total_stars,
+        "items": [serialize_review(review) for review in reviews],
+    }
+
+
+@app.post("/api/reviews")
+def create_review(req: ReviewCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    require_approved_user(current_user)
+    rating = max(1, min(5, int(req.rating or 5)))
+    comment = (req.comment or "").strip()
+    if len(comment) < 8:
+        raise HTTPException(status_code=400, detail="Nhận xét cần ít nhất 8 ký tự.")
+    if len(comment) > 420:
+        raise HTTPException(status_code=400, detail="Nhận xét tối đa 420 ký tự.")
+
+    review = db.query(models.Review).filter_by(user_id=current_user.id).first()
+    now = datetime.datetime.utcnow()
+    if review:
+        review.rating = rating
+        review.comment = comment
+        review.updated_at = now
+    else:
+        review = models.Review(user_id=current_user.id, rating=rating, comment=comment, created_at=now, updated_at=now)
+        db.add(review)
+    db.commit()
+    db.refresh(review)
+    return {"msg": "Cảm ơn bạn đã gửi đánh giá cho HanLingua.", "review": serialize_review(review)}
+
 
 @app.post("/api/auth/forgot-password")
 def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):

@@ -7,6 +7,7 @@ let tabState = {
     aiData: { transcript: "", audioB64: "" }
 };
 let currentPayment = null;
+let selectedReviewRating = 5;
 
 const VIEW_ROUTES = {
     'view-landing': '/',
@@ -172,6 +173,7 @@ const AuthUI = {
         applyTheme();
         renderUserAccessState();
         loadDailyContent();
+        loadReviews();
         showWelcomeModal();
         initMotionReveal();
         if (!applyRouteFromLocation({ replace: true })) {
@@ -328,6 +330,7 @@ const AuthUI = {
                 <button onclick="AuthUI.openModal(false)" class="bg-hanred-600 hover:bg-hanred-700 text-white px-5 py-2.5 rounded-lg font-black transition shadow-md cursor-pointer">Bắt đầu ngay</button>`;
         }
         updateLandingAuthActions();
+        renderReviewFormState();
     },
 
     logout() {
@@ -509,6 +512,140 @@ async function loadDailyContent() {
         if (messageEl) messageEl.innerText = "Không thể tải nội dung hôm nay. Bạn vẫn có thể bắt đầu bằng một bài nghe ngắn.";
         mediaEl.innerHTML = '';
         if (playlistEl) playlistEl.innerHTML = '';
+    }
+}
+
+function reviewStarsMarkup(rating = 0) {
+    const value = Math.round(Number(rating) || 0);
+    return Array.from({ length: 5 }, (_, index) => (
+        `<span class="${index < value ? 'is-filled' : ''}">★</span>`
+    )).join('');
+}
+
+function renderReviewFormState() {
+    const ratingInput = document.getElementById('review-rating-input');
+    const status = document.getElementById('review-form-status');
+    const submitBtn = document.getElementById('review-submit-btn');
+    if (ratingInput) {
+        ratingInput.querySelectorAll('button').forEach((btn, index) => {
+            btn.classList.toggle('is-active', index < selectedReviewRating);
+            btn.setAttribute('aria-checked', index + 1 === selectedReviewRating ? 'true' : 'false');
+        });
+    }
+    if (status) {
+        status.innerText = currentUser
+            ? `Bạn đang gửi với tài khoản ${currentUser.username}.`
+            : 'Đăng nhập để gửi đánh giá của bạn.';
+    }
+    if (submitBtn) {
+        submitBtn.innerText = currentUser ? 'Gửi đánh giá' : 'Đăng nhập để gửi';
+    }
+}
+
+function setReviewRating(rating) {
+    selectedReviewRating = Math.max(1, Math.min(5, Number(rating) || 5));
+    renderReviewFormState();
+}
+
+function renderReviewCard(review) {
+    const username = review.username || 'HanLingua learner';
+    const initial = username.charAt(0).toUpperCase();
+    const date = review.updated_at || review.created_at;
+    const dateText = date ? new Date(date).toLocaleDateString('vi-VN') : 'Gần đây';
+    const avatar = review.avatar_url
+        ? `<img src="${resolveAssetUrl(review.avatar_url)}" alt="${escapeHtml(username)}">`
+        : `<span>${escapeHtml(initial)}</span>`;
+    return `
+        <article class="review-card motion-card">
+            <div class="review-card-head">
+                <div class="review-avatar">${avatar}</div>
+                <div>
+                    <div class="review-username">${escapeHtml(username)}</div>
+                    <div class="review-date">${dateText}</div>
+                </div>
+            </div>
+            <div class="review-card-stars">${reviewStarsMarkup(review.rating)}</div>
+            <p>${escapeHtml(review.comment || '')}</p>
+        </article>`;
+}
+
+function renderReviews(data = {}) {
+    const averageEl = document.getElementById('reviews-average');
+    const starsEl = document.getElementById('reviews-average-stars');
+    const totalCountEl = document.getElementById('reviews-total-count');
+    const totalStarsEl = document.getElementById('reviews-total-stars');
+    const listEl = document.getElementById('reviews-list');
+    if (!averageEl || !starsEl || !totalCountEl || !totalStarsEl || !listEl) return;
+
+    const items = Array.isArray(data.items) ? data.items : [];
+    const average = Number(data.average_rating || 0);
+    const totalReviews = Number(data.total_reviews || 0);
+    const totalStars = Number(data.total_stars || 0);
+
+    averageEl.innerText = totalReviews ? average.toFixed(1) : '0.0';
+    starsEl.innerHTML = reviewStarsMarkup(average);
+    totalCountEl.innerText = totalReviews.toLocaleString('vi-VN');
+    totalStarsEl.innerText = totalStars.toLocaleString('vi-VN');
+
+    if (!items.length) {
+        listEl.innerHTML = `
+            <div class="review-empty-state">
+                <i class="fa-solid fa-star"></i>
+                <b>Chưa có nhận xét nào</b>
+                <span>Hãy là người đầu tiên để lại cảm nhận về HanLingua.</span>
+            </div>`;
+        return;
+    }
+
+    listEl.innerHTML = items.slice(0, 6).map(renderReviewCard).join('');
+    setTimeout(initMotionReveal, 40);
+}
+
+async function loadReviews() {
+    renderReviewFormState();
+    try {
+        const data = await API.getReviews();
+        renderReviews(data);
+    } catch (e) {
+        const listEl = document.getElementById('reviews-list');
+        if (listEl) {
+            listEl.innerHTML = `
+                <div class="review-empty-state">
+                    <i class="fa-solid fa-wifi"></i>
+                    <b>Chưa tải được đánh giá</b>
+                    <span>Bạn vẫn có thể học bình thường, hãy thử tải lại sau.</span>
+                </div>`;
+        }
+    }
+}
+
+async function submitReview(event) {
+    event.preventDefault();
+    if (!currentUser) {
+        AuthUI.openModal(true);
+        return;
+    }
+
+    const commentEl = document.getElementById('review-comment');
+    const status = document.getElementById('review-form-status');
+    const submitBtn = document.getElementById('review-submit-btn');
+    const comment = (commentEl?.value || '').trim();
+    if (comment.length < 8) {
+        if (status) status.innerText = 'Nhận xét cần ít nhất 8 ký tự.';
+        return;
+    }
+
+    try {
+        if (submitBtn) submitBtn.disabled = true;
+        if (status) status.innerText = 'Đang gửi đánh giá...';
+        const res = await API.createReview(selectedReviewRating, comment);
+        if (commentEl) commentEl.value = '';
+        await loadReviews();
+        if (status) status.innerText = res.msg || 'Đã gửi đánh giá. Cảm ơn bạn!';
+    } catch (e) {
+        if (status) status.innerText = e.message || 'Không thể gửi đánh giá lúc này.';
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
 

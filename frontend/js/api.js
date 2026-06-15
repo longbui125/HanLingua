@@ -116,6 +116,22 @@ const API = {
         return res.json();
     },
 
+    async getReviews() {
+        const res = await fetch(`${API_BASE}/reviews`);
+        if (!res.ok) throw new Error("Không thể tải đánh giá");
+        return res.json();
+    },
+
+    async createReview(rating, comment) {
+        const res = await fetch(`${API_BASE}/reviews`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ rating, comment })
+        });
+        if (!res.ok) throw await apiError(res, "Không thể gửi đánh giá");
+        return res.json();
+    },
+
     //LESSONS
     async getLessonList() {
         const res = await fetch(`${API_BASE}/lessons/list`); 
