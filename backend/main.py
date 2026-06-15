@@ -548,7 +548,6 @@ def list_reviews(db: Session = Depends(get_db)):
     return {
         "average_rating": average_rating,
         "total_reviews": total_reviews,
-        "total_stars": total_stars,
         "items": [serialize_review(review) for review in reviews],
     }
 
