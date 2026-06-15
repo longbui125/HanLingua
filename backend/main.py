@@ -28,6 +28,23 @@ AI_MEDIA_EXTENSIONS = {
     ".mp4", ".webm", ".mov", ".mkv", ".avi", ".m4v",
 }
 
+LESSON_AUDIO_EXTENSIONS = {
+    ".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac", ".webm",
+}
+
+LESSON_AUDIO_CONTENT_TYPES = {
+    "audio/mpeg": ".mp3",
+    "audio/mp3": ".mp3",
+    "audio/wav": ".wav",
+    "audio/x-wav": ".wav",
+    "audio/mp4": ".m4a",
+    "audio/x-m4a": ".m4a",
+    "audio/aac": ".aac",
+    "audio/ogg": ".ogg",
+    "audio/flac": ".flac",
+    "audio/webm": ".webm",
+}
+
 
 def convert_media_to_mp3(input_path: str) -> str:
     output_file = tempfile.NamedTemporaryFile(prefix="hanlingua_ai_", suffix=".mp3", delete=False)
@@ -139,6 +156,9 @@ def normalize_lesson_category(category: Optional[str], level: Optional[int] = No
     if level == 2:
         return "intermediate"
     return "beginner"
+
+def lesson_level_from_category(category: Optional[str], level: Optional[int] = None):
+    return 2 if normalize_lesson_category(category, level) == "intermediate" else 1
 
 def get_learning_stage(day_number: int):
     if day_number <= 30:
@@ -817,26 +837,50 @@ async def process_youtube(data: dict, current_user: models.User = Depends(auth.g
 @app.post("/api/admin/upload-audio")
 async def upload_audio(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):
     require_operator(current_user)
-    filename = os.path.basename(file.filename or f"audio_{int(datetime.datetime.utcnow().timestamp())}")
+    original_name = os.path.basename(file.filename or "")
+    _, original_ext = os.path.splitext(original_name)
+    original_ext = original_ext.lower()
+    content_type = (file.content_type or "").lower()
+    inferred_ext = LESSON_AUDIO_CONTENT_TYPES.get(content_type)
+    if original_ext not in LESSON_AUDIO_EXTENSIONS and not inferred_ext:
+        raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file audio MP3, WAV, M4A, AAC, OGG, FLAC hoặc WEBM.")
+    ext = original_ext if original_ext in LESSON_AUDIO_EXTENSIONS else inferred_ext
     content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="File audio rỗng.")
+    if len(content) > 60 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File audio tối đa 60MB.")
+    stem = os.path.splitext(original_name)[0] or "audio"
+    safe_stem = re.sub(r"[^a-zA-Z0-9_-]+", "-", stem).strip("-")[:48] or "audio"
+    timestamp = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
+    filename = f"{timestamp}_{safe_stem}{ext}"
+    upload_content_type = content_type if content_type.startswith("audio/") else "application/octet-stream"
     if is_supabase_storage_enabled():
-        audio_url = upload_public_file(f"lesson_audio/{filename}", content, file.content_type or "application/octet-stream")
-        return {"url": audio_url}
-    file_path = os.path.join(DATA_DIR, filename)
+        audio_url = upload_public_file(f"lesson_audio/{filename}", content, upload_content_type)
+        return {"url": audio_url, "content_type": upload_content_type}
+    audio_dir = os.path.join(DATA_DIR, "lesson_audio")
+    os.makedirs(audio_dir, exist_ok=True)
+    file_path = os.path.join(audio_dir, filename)
     with open(file_path, "wb") as buffer:
         buffer.write(content)
-    return {"url": f"/data/{filename}"}
+    return {"url": f"/data/lesson_audio/{filename}", "content_type": upload_content_type}
 
 @app.post("/api/admin/lessons")
 def create_lesson(req: LessonCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     require_operator(current_user)
+    title = req.title.strip()
+    audio_url = req.audio_url.strip()
+    transcript = req.transcript.strip()
+    if not title or not audio_url or not transcript:
+        raise HTTPException(status_code=400, detail="Vui lòng nhập tiêu đề, audio và transcript.")
+    category = normalize_lesson_category(req.category, req.level)
     new_lesson = models.Lesson(
-        title=req.title, 
-        level=req.level, 
-        category=normalize_lesson_category(req.category, req.level),
-        audio_url=req.audio_url,
-        transcript=req.transcript, 
-        translation=req.translation,
+        title=title,
+        level=lesson_level_from_category(category, req.level),
+        category=category,
+        audio_url=audio_url,
+        transcript=transcript,
+        translation=req.translation.strip() if req.translation else "",
         cloze_data_json="[]" 
     )
     db.add(new_lesson)
@@ -855,9 +899,10 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
     output_template = os.path.join(DATA_DIR, filename_base)
     cookiefile, cookiefile_to_cleanup = build_ytdlp_cookiefile()
 
-    audio_path = f"{output_template}.m4a"
+    audio_path = ""
     try:
         download_with_ytdlp_fallbacks(req.source_url, output_template, cookiefile)
+        audio_path = find_downloaded_audio(output_template)
         transcript = generate_transcript_json(audio_path)
     except Exception as exc:
         if os.path.exists(audio_path):
@@ -871,16 +916,19 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
         if cookiefile_to_cleanup and os.path.exists(cookiefile_to_cleanup):
             os.remove(cookiefile_to_cleanup)
 
+    category = normalize_lesson_category(req.category, req.level)
+    _, audio_ext = os.path.splitext(audio_path)
+    audio_ext = audio_ext or ".m4a"
     if is_supabase_storage_enabled():
         with open(audio_path, "rb") as f:
-            audio_url = upload_public_file(f"lesson_audio/{filename_base}.m4a", f.read(), "audio/mp4")
+            audio_url = upload_public_file(f"lesson_audio/{filename_base}{audio_ext}", f.read(), "audio/mp4")
         os.remove(audio_path)
     else:
-        audio_url = f"/data/{filename_base}.m4a"
+        audio_url = f"/data/{os.path.basename(audio_path)}"
     lesson = models.Lesson(
         title=req.title.strip(),
-        level=req.level,
-        category=normalize_lesson_category(req.category, req.level),
+        level=lesson_level_from_category(category, req.level),
+        category=category,
         audio_url=audio_url,
         transcript=" ".join(transcript),
         translation=req.translation or "",
@@ -893,9 +941,23 @@ def create_lesson_from_url(req: ExternalLessonCreate, db: Session = Depends(get_
 @app.delete("/api/admin/lessons/{lesson_id}")
 def delete_lesson(lesson_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     require_operator(current_user)
+    lesson = db.query(models.Lesson).filter_by(id=lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Không tìm thấy bài học")
+    audio_url = lesson.audio_url or ""
     db.query(models.UserProgress).filter_by(lesson_id=lesson_id).delete()
-    db.query(models.Lesson).filter_by(id=lesson_id).delete()
-    db.commit(); return {"msg": "Đã xóa"}
+    db.delete(lesson)
+    db.commit()
+    try:
+        if is_supabase_storage_enabled() and audio_url.startswith("http"):
+            delete_public_file(audio_url)
+        elif audio_url.startswith("/data/"):
+            local_path = os.path.join(DATA_DIR, audio_url.replace("/data/", "", 1))
+            if os.path.exists(local_path):
+                os.remove(local_path)
+    except Exception:
+        pass
+    return {"msg": "Đã xóa"}
 
 @app.get("/api/admin/users")
 def list_users(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):

@@ -1963,7 +1963,7 @@ async function loadDefaultData(id) {
         document.getElementById('translation-box').classList.add('hidden');
         
         // Load Audio
-        document.getElementById('audio-container').innerHTML = `<audio controls class="dictation-native-audio"><source src="${tabState.lessonData.audioSrc}" type="audio/mp3"></audio>`;
+        document.getElementById('audio-container').innerHTML = `<audio controls class="dictation-native-audio" src="${tabState.lessonData.audioSrc}"></audio>`;
         
         // Load Transcript
         if (data.translation) {

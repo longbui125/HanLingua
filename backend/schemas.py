@@ -21,7 +21,7 @@ class ClozeEvalRequest(BaseModel):
 
 class LessonCreate(BaseModel):
     title: str
-    level: int
+    level: Optional[int] = None
     audio_url: str
     transcript: str
     translation: str
@@ -30,7 +30,7 @@ class LessonCreate(BaseModel):
 
 class ExternalLessonCreate(BaseModel):
     title: str
-    level: int
+    level: Optional[int] = None
     source_url: str
     translation: Optional[str] = ""
     category: str = "beginner"

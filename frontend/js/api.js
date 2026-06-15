@@ -370,13 +370,13 @@ const API = {
         return res.json();
     },
 
-        async uploadAudio(formData) {
+    async uploadAudio(formData) {
         const res = await fetch(`${API_BASE}/admin/upload-audio`, {
             method: 'POST',
             headers: getAuthOnlyHeaders(),
             body: formData 
         });
-        if (!res.ok) throw new Error("Không thể tải lên file");
+        if (!res.ok) throw await apiError(res, "Không thể tải lên file");
         return res.json();
     },
 

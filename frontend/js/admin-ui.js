@@ -1,4 +1,8 @@
 const AdminUI = {
+    lessonLevelFromCategory(category) {
+        return category === 'intermediate' ? 2 : 1;
+    },
+
     async loadLessonList() {
         const container = document.getElementById('admin-lesson-management');
         try {
@@ -234,6 +238,10 @@ const AdminUI = {
             await API.addVocabulary(payload);
             ['admin-vocab-korean', 'admin-vocab-hanviet', 'admin-vocab-meaning', 'admin-vocab-topic', 'admin-vocab-example'].forEach(id => document.getElementById(id).value = '');
             await this.loadVocabulary();
+            const userVocabularyPanel = document.getElementById('user-vocabulary-section');
+            if (userVocabularyPanel && !userVocabularyPanel.classList.contains('hidden')) {
+                await VocabularyUI.load();
+            }
             alert('Đã thêm từ vựng');
         } catch (e) {
             alert('Lỗi thêm từ vựng: ' + e.message);
@@ -245,6 +253,10 @@ const AdminUI = {
         try {
             await API.deleteVocabulary(id);
             await this.loadVocabulary();
+            const userVocabularyPanel = document.getElementById('user-vocabulary-section');
+            if (userVocabularyPanel && !userVocabularyPanel.classList.contains('hidden')) {
+                await VocabularyUI.load();
+            }
         } catch (e) {
             alert('Lỗi xóa từ vựng: ' + e.message);
         }
@@ -253,12 +265,27 @@ const AdminUI = {
     async uploadVocabularyImage(id, input) {
         const file = input?.files?.[0];
         if (!file) return;
+        const allowedImage = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type);
+        if (!allowedImage) {
+            input.value = '';
+            return alert('Chỉ hỗ trợ ảnh PNG, JPG hoặc WEBP.');
+        }
+        if (file.size > 3 * 1024 * 1024) {
+            input.value = '';
+            return alert('Ảnh tối đa 3MB.');
+        }
         try {
             await API.updateVocabularyImage(id, file);
             input.value = '';
             await this.loadVocabulary();
+            const userVocabularyPanel = document.getElementById('user-vocabulary-section');
+            if (userVocabularyPanel && !userVocabularyPanel.classList.contains('hidden')) {
+                await VocabularyUI.load();
+            }
         } catch (e) {
             alert('Lỗi cập nhật ảnh: ' + e.message);
+        } finally {
+            input.value = '';
         }
     },
 
@@ -266,6 +293,10 @@ const AdminUI = {
         try {
             await API.deleteVocabularyImage(id);
             await this.loadVocabulary();
+            const userVocabularyPanel = document.getElementById('user-vocabulary-section');
+            if (userVocabularyPanel && !userVocabularyPanel.classList.contains('hidden')) {
+                await VocabularyUI.load();
+            }
         } catch (e) {
             alert('Lỗi gỡ ảnh: ' + e.message);
         }
@@ -273,6 +304,16 @@ const AdminUI = {
 
     async uploadAudio(input) {
         if (!input.files[0]) return;
+        const file = input.files[0];
+        const allowedAudio = /\.(mp3|wav|m4a|aac|ogg|flac|webm)$/i.test(file.name || '');
+        if (!allowedAudio && !String(file.type || '').startsWith('audio/')) {
+            input.value = '';
+            return alert('Vui lòng chọn đúng file audio.');
+        }
+        if (file.size > 60 * 1024 * 1024) {
+            input.value = '';
+            return alert('File audio tối đa 60MB.');
+        }
         
         const textInput = document.getElementById('admin-audio');
         const status = input.nextElementSibling; // Nút chọn file
@@ -280,30 +321,33 @@ const AdminUI = {
         try {
             status.innerText = "Đang tải...";
             const formData = new FormData();
-            formData.append('file', input.files[0]);
+            formData.append('file', file);
             
             const data = await API.uploadAudio(formData);
             
             textInput.value = data.url;
-            status.innerText = "Đã chọn";
+            status.innerText = "Đã tải lên";
         } catch (e) { 
             alert("Lỗi tải file: " + e.message); 
             status.innerText = "Chọn file";
+        } finally {
+            input.value = '';
         }
     },
 
     async submitLesson() {
+        const category = document.getElementById('admin-category').value;
         const payload = {
             title: document.getElementById('admin-title').value,
-            level: parseInt(document.getElementById('admin-level').value),
-            category: document.getElementById('admin-category').value,
+            level: this.lessonLevelFromCategory(category),
+            category,
             audio_url: document.getElementById('admin-audio').value,
             transcript: document.getElementById('admin-transcript').value,
             translation: document.getElementById('admin-translation').value
         };
 
-        if (!payload.title || !payload.transcript) {
-            return alert("Vui lòng nhập ít nhất là Tiêu đề và Transcript!");
+        if (!payload.title || !payload.audio_url || !payload.transcript) {
+            return alert("Vui lòng nhập tiêu đề, tải audio và nhập transcript trước khi tạo bài học!");
         }
 
         try {
@@ -312,16 +356,18 @@ const AdminUI = {
             
             this.resetForm();
             this.loadLessonList();
+            await loadUserLessonList();
         } catch (e) {
             alert("Lỗi khi tạo: " + e.message);
         }
     },
 
     async submitLessonFromUrl() {
+        const category = document.getElementById('admin-url-category').value;
         const payload = {
             title: document.getElementById('admin-url-title').value,
-            level: parseInt(document.getElementById('admin-url-level').value),
-            category: document.getElementById('admin-url-category').value,
+            level: this.lessonLevelFromCategory(category),
+            category,
             source_url: document.getElementById('admin-source-url').value,
             translation: document.getElementById('admin-url-translation').value
         };
@@ -340,6 +386,7 @@ const AdminUI = {
             });
             status.innerText = "";
             this.loadLessonList();
+            await loadUserLessonList();
         } catch (e) {
             status.innerText = "Lỗi: " + e.message;
         }
@@ -350,8 +397,9 @@ const AdminUI = {
         ['admin-title', 'admin-audio', 'admin-transcript', 'admin-translation'].forEach(id => {
             document.getElementById(id).value = '';
         });
-        document.getElementById('admin-level').value = '1';
         document.getElementById('admin-category').value = 'beginner';
+        const audioButton = document.getElementById('admin-audio-file')?.nextElementSibling;
+        if (audioButton) audioButton.innerText = 'Chọn file';
     },
     
     async delete(id) {
@@ -359,6 +407,7 @@ const AdminUI = {
             try {
                 await API.deleteLesson(id);
                 this.loadLessonList();
+                await loadUserLessonList();
             } catch(e) { alert(e.message); }
         }
     }
