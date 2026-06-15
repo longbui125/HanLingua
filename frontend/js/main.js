@@ -38,6 +38,76 @@ const ADMIN_PANEL_ROUTES = {
     'admin-payments-section': '/admin/payments'
 };
 
+const SEO_SITE_URL = 'https://han-lingua.vercel.app';
+const SEO_DEFAULT = {
+    path: '/',
+    title: 'HanLingua - Hệ sinh thái học tiếng Hàn toàn diện',
+    description: 'HanLingua là hệ sinh thái học tiếng Hàn theo phương pháp sound-first: luyện nghe chép dictation, AI phân tích lỗi sai, luyện nói và học từ vựng TOPIK.',
+    keywords: 'học tiếng Hàn, luyện nghe tiếng Hàn, dictation tiếng Hàn, nghe chép tiếng Hàn, luyện nói tiếng Hàn bằng AI, từ vựng TOPIK, HanLingua',
+    robots: 'index,follow,max-image-preview:large'
+};
+const SEO_PAGES = {
+    '/': SEO_DEFAULT,
+    '/home': SEO_DEFAULT,
+    '/hoc-tieng-han': {
+        ...SEO_DEFAULT,
+        path: '/hoc-tieng-han',
+        title: 'Học tiếng Hàn theo phương pháp Sound-First - HanLingua',
+        description: 'Học tiếng Hàn trên HanLingua với lộ trình nghe trước, chép lại, phân tích lỗi sai bằng AI, luyện nói và ôn từ vựng TOPIK mỗi ngày.',
+        keywords: 'học tiếng Hàn, hệ sinh thái học tiếng Hàn, lộ trình học tiếng Hàn cho người mới bắt đầu, sound-first tiếng Hàn'
+    },
+    '/he-sinh-thai-hoc-tieng-han': {
+        ...SEO_DEFAULT,
+        path: '/he-sinh-thai-hoc-tieng-han',
+        title: 'Hệ sinh thái học tiếng Hàn toàn diện - HanLingua',
+        description: 'HanLingua kết hợp dictation, AI speaking, Forecast TOPIK và theo dõi tiến độ để tạo một nền tảng học tiếng Hàn toàn diện cho người Việt.',
+        keywords: 'hệ sinh thái học tiếng Hàn, nền tảng học tiếng Hàn toàn diện, học tiếng Hàn bằng AI'
+    },
+    '/nghe-chep-tieng-han': {
+        ...SEO_DEFAULT,
+        path: '/nghe-chep-tieng-han',
+        title: 'Nghe chép tiếng Hàn có chấm điểm bằng AI - HanLingua',
+        description: 'Luyện nghe chép tiếng Hàn qua dictation: nghe audio thực tế, gõ lại nội dung, đối chiếu transcript và nhận phân tích lỗi sai.',
+        keywords: 'nghe chép tiếng Hàn, luyện nghe tiếng Hàn qua dictation, chép chính tả tiếng Hàn có chấm điểm, luyện nghe tiếng Hàn audio thực tế'
+    },
+    '/luyen-nghe-tieng-han': {
+        ...SEO_DEFAULT,
+        path: '/luyen-nghe-tieng-han',
+        title: 'Luyện nghe tiếng Hàn audio thực tế - HanLingua',
+        description: 'HanLingua giúp bạn luyện nghe tiếng Hàn bằng audio thực tế, nghe lại nhiều lần, chép chính tả và sửa lỗi để nghe hiểu tốt hơn.',
+        keywords: 'luyện nghe tiếng Hàn, cách nghe hiểu người Hàn nói nhanh, luyện nghe tiếng Hàn audio thực tế'
+    },
+    '/luyen-noi-tieng-han-ai': {
+        ...SEO_DEFAULT,
+        path: '/luyen-noi-tieng-han-ai',
+        title: 'Luyện nói tiếng Hàn với AI - HanLingua',
+        description: 'Luyện nói tiếng Hàn theo tình huống với HanLingua AI, thực hành hội thoại và nhận phản hồi để cải thiện phản xạ nói.',
+        keywords: 'luyện nói tiếng Hàn với AI, sửa lỗi phát âm tiếng Hàn bằng AI, hội thoại tiếng Hàn AI'
+    },
+    '/tu-vung-topik': {
+        ...SEO_DEFAULT,
+        path: '/tu-vung-topik',
+        title: 'Từ vựng TOPIK theo chủ đề - Forecast Vocabulary HanLingua',
+        description: 'Học từ vựng TOPIK theo chủ đề với flashcard, nghĩa tiếng Việt, ví dụ và phát âm để ôn tập có hệ thống hơn.',
+        keywords: 'từ vựng TOPIK, forecast từ vựng TOPIK, học từ vựng tiếng Hàn theo chủ đề'
+    },
+    '/bang-gia': {
+        ...SEO_DEFAULT,
+        path: '/bang-gia',
+        title: 'Bảng giá HanLingua - Gói học tiếng Hàn bằng AI',
+        description: 'Xem các gói học HanLingua cho dictation, AI speaking, Forecast TOPIK và theo dõi tiến độ học tiếng Hàn.',
+        keywords: 'bảng giá HanLingua, gói học tiếng Hàn, học tiếng Hàn bằng AI'
+    },
+    '/pricing': {
+        ...SEO_DEFAULT,
+        path: '/pricing',
+        title: 'Bảng giá HanLingua - Gói học tiếng Hàn bằng AI',
+        description: 'Xem các gói học HanLingua cho dictation, AI speaking, Forecast TOPIK và theo dõi tiến độ học tiếng Hàn.',
+        keywords: 'bảng giá HanLingua, gói học tiếng Hàn, học tiếng Hàn bằng AI'
+    }
+};
+const SEO_NOINDEX_PREFIXES = ['/admin', '/learning', '/account', '/progress', '/notifications', '/playlist', '/payment'];
+
 let isApplyingRoute = false;
 
 function normalizeRoutePath(path = window.location.pathname) {
@@ -45,10 +115,136 @@ function normalizeRoutePath(path = window.location.pathname) {
     return cleaned === '' ? '/' : cleaned;
 }
 
+function setMetaContent(selector, content, attr = 'content') {
+    if (!content) return;
+    let el = document.head.querySelector(selector);
+    if (!el) {
+        el = document.createElement('meta');
+        const nameMatch = selector.match(/meta\[name="([^"]+)"\]/);
+        const propertyMatch = selector.match(/meta\[property="([^"]+)"\]/);
+        if (nameMatch) el.setAttribute('name', nameMatch[1]);
+        if (propertyMatch) el.setAttribute('property', propertyMatch[1]);
+        document.head.appendChild(el);
+    }
+    el.setAttribute(attr, content);
+}
+
+function setCanonical(href) {
+    let link = document.head.querySelector('link[rel="canonical"]');
+    if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', 'canonical');
+        document.head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+}
+
+function getSeoForPath(path = window.location.pathname) {
+    const routePath = normalizeRoutePath(path);
+    if (SEO_NOINDEX_PREFIXES.some(prefix => routePath === prefix || routePath.startsWith(`${prefix}/`))) {
+        return {
+            ...SEO_DEFAULT,
+            path: routePath,
+            title: 'HanLingua - Không gian học tập',
+            description: 'Không gian học tập cá nhân trên HanLingua.',
+            robots: 'noindex,nofollow'
+        };
+    }
+    return SEO_PAGES[routePath] || SEO_DEFAULT;
+}
+
+function updateStructuredData(seo) {
+    const graph = [
+        {
+            '@type': 'Organization',
+            '@id': `${SEO_SITE_URL}/#organization`,
+            name: 'HanLingua',
+            url: SEO_SITE_URL,
+            logo: `${SEO_SITE_URL}/assets/img_10.png`,
+            description: SEO_DEFAULT.description
+        },
+        {
+            '@type': 'WebSite',
+            '@id': `${SEO_SITE_URL}/#website`,
+            name: 'HanLingua',
+            url: SEO_SITE_URL,
+            inLanguage: 'vi-VN',
+            publisher: { '@id': `${SEO_SITE_URL}/#organization` }
+        },
+        {
+            '@type': 'SoftwareApplication',
+            '@id': `${SEO_SITE_URL}/#app`,
+            name: 'HanLingua',
+            applicationCategory: 'EducationalApplication',
+            operatingSystem: 'Web',
+            url: SEO_SITE_URL,
+            inLanguage: 'vi-VN',
+            description: SEO_DEFAULT.description,
+            offers: {
+                '@type': 'Offer',
+                priceCurrency: 'VND',
+                price: '0'
+            }
+        },
+        {
+            '@type': 'WebPage',
+            '@id': `${SEO_SITE_URL}${seo.path}#webpage`,
+            url: `${SEO_SITE_URL}${seo.path}`,
+            name: seo.title,
+            description: seo.description,
+            isPartOf: { '@id': `${SEO_SITE_URL}/#website` },
+            about: { '@id': `${SEO_SITE_URL}/#app` },
+            inLanguage: 'vi-VN'
+        }
+    ];
+
+    let script = document.getElementById('hanlingua-jsonld');
+    if (!script) {
+        script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'hanlingua-jsonld';
+        document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+}
+
+function updateSeoForCurrentRoute() {
+    const seo = getSeoForPath();
+    const canonical = `${SEO_SITE_URL}${seo.path}`;
+    document.title = seo.title;
+    setCanonical(canonical);
+    setMetaContent('meta[name="description"]', seo.description);
+    setMetaContent('meta[name="keywords"]', seo.keywords || SEO_DEFAULT.keywords);
+    setMetaContent('meta[name="robots"]', seo.robots || SEO_DEFAULT.robots);
+    setMetaContent('meta[property="og:title"]', seo.title);
+    setMetaContent('meta[property="og:description"]', seo.description);
+    setMetaContent('meta[property="og:url"]', canonical);
+    setMetaContent('meta[property="og:image"]', `${SEO_SITE_URL}/assets/%E1%BA%A3nh%203.jpg`);
+    setMetaContent('meta[name="twitter:title"]', seo.title);
+    setMetaContent('meta[name="twitter:description"]', seo.description);
+    setMetaContent('meta[name="twitter:image"]', `${SEO_SITE_URL}/assets/%E1%BA%A3nh%203.jpg`);
+    updateStructuredData(seo);
+}
+
 function routeForPath(path = window.location.pathname) {
     const routePath = normalizeRoutePath(path);
     if (routePath === '/' || routePath === '/home') {
         return { viewId: 'view-landing' };
+    }
+    if (['/hoc-tieng-han', '/he-sinh-thai-hoc-tieng-han'].includes(routePath)) {
+        return { viewId: 'view-landing', sectionId: 'about' };
+    }
+    if (['/nghe-chep-tieng-han', '/luyen-nghe-tieng-han'].includes(routePath)) {
+        return { viewId: 'view-landing', sectionId: 'features' };
+    }
+    if (routePath === '/luyen-noi-tieng-han-ai') {
+        return { viewId: 'view-landing', sectionId: 'features' };
+    }
+    if (routePath === '/tu-vung-topik') {
+        return { viewId: 'view-landing', sectionId: 'features' };
+    }
+    if (routePath === '/bang-gia') {
+        return { viewId: 'view-landing', sectionId: 'pricing' };
     }
     if (routePath === '/dictation' || routePath === '/ai-dictation') {
         return { viewId: 'view-dictation' };
@@ -96,6 +292,7 @@ function setRoute(path, { replace = false } = {}) {
     if (current === next) return;
     const method = replace ? 'replaceState' : 'pushState';
     window.history[method]({}, '', next);
+    updateSeoForCurrentRoute();
 }
 
 function setRouteForView(viewId, options = {}) {
@@ -127,6 +324,7 @@ function applyRouteFromLocation(options = {}) {
     if (!route) {
         window.history.replaceState({}, '', '/');
         switchView('view-landing', { skipRoute: true });
+        updateSeoForCurrentRoute();
         return false;
     }
 
@@ -148,6 +346,7 @@ function applyRouteFromLocation(options = {}) {
         if (route.viewId === 'view-landing' && (route.sectionId || window.location.hash)) {
             setTimeout(() => scrollToSection(route.sectionId || window.location.hash.slice(1)), 80);
         }
+        updateSeoForCurrentRoute();
         return true;
     } finally {
         isApplyingRoute = false;

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /learning
+Disallow: /learning/
+Disallow: /account
+Disallow: /progress
+Disallow: /notifications
+Disallow: /playlist
+Disallow: /payment
+
+Sitemap: https://han-lingua.vercel.app/sitemap.xml

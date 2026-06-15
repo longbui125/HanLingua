@@ -5,6 +5,63 @@
     <base href="/">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HanLingua - Hệ sinh thái học tiếng Hàn toàn diện</title>
+    <meta name="description" content="HanLingua là hệ sinh thái học tiếng Hàn theo phương pháp sound-first: luyện nghe chép dictation, AI phân tích lỗi sai, luyện nói và học từ vựng TOPIK.">
+    <meta name="keywords" content="học tiếng Hàn, luyện nghe tiếng Hàn, dictation tiếng Hàn, nghe chép tiếng Hàn, luyện nói tiếng Hàn bằng AI, từ vựng TOPIK, HanLingua">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="theme-color" content="#ef3b3b">
+    <link rel="canonical" href="https://han-lingua.vercel.app/">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="HanLingua">
+    <meta property="og:title" content="HanLingua - Hệ sinh thái học tiếng Hàn toàn diện">
+    <meta property="og:description" content="Luyện nghe chép tiếng Hàn qua dictation, AI phân tích lỗi sai, luyện nói và học từ vựng TOPIK trong một không gian học thân thiện.">
+    <meta property="og:url" content="https://han-lingua.vercel.app/">
+    <meta property="og:image" content="https://han-lingua.vercel.app/assets/%E1%BA%A3nh%203.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HanLingua - Hệ sinh thái học tiếng Hàn toàn diện">
+    <meta name="twitter:description" content="Học tiếng Hàn theo phương pháp sound-first với dictation, AI speaking và Forecast TOPIK.">
+    <meta name="twitter:image" content="https://han-lingua.vercel.app/assets/%E1%BA%A3nh%203.jpg">
+    <link rel="preload" as="image" href="assets/%E1%BA%A3nh%203.jpg">
+    <script type="application/ld+json" id="hanlingua-jsonld">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://han-lingua.vercel.app/#organization",
+          "name": "HanLingua",
+          "url": "https://han-lingua.vercel.app",
+          "logo": "https://han-lingua.vercel.app/assets/img_10.png",
+          "description": "HanLingua là hệ sinh thái học tiếng Hàn theo phương pháp sound-first: luyện nghe chép dictation, AI phân tích lỗi sai, luyện nói và học từ vựng TOPIK."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://han-lingua.vercel.app/#website",
+          "name": "HanLingua",
+          "url": "https://han-lingua.vercel.app",
+          "inLanguage": "vi-VN",
+          "publisher": {
+            "@id": "https://han-lingua.vercel.app/#organization"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://han-lingua.vercel.app/#app",
+          "name": "HanLingua",
+          "applicationCategory": "EducationalApplication",
+          "operatingSystem": "Web",
+          "url": "https://han-lingua.vercel.app",
+          "inLanguage": "vi-VN",
+          "description": "Luyện nghe chép tiếng Hàn, AI speaking, Forecast TOPIK và theo dõi tiến độ học tập trong một nền tảng.",
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "VND",
+            "price": "0"
+          }
+        }
+      ]
+    }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -117,14 +174,14 @@
                     <div class="max-w-3xl motion-left">
                         <div class="landing-kicker rounded-full px-4 py-2 text-sm font-black mb-7">
                             <i class="fa-solid fa-wave-square text-hanred-600"></i>
-                            Nền tảng học tiếng Hàn theo nhịp mỗi ngày
+                            Hệ sinh thái học tiếng Hàn theo phương pháp Sound-First
                         </div>
                         <h1 class="text-5xl md:text-7xl font-black text-gray-950 leading-[0.98] tracking-tight mb-7">
                             Học tiếng Hàn<br>
-                            vui hơn mỗi ngày.
+                            nghe trước, nói chắc.
                         </h1>
                         <p class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mb-9">
-                            HanLingua gom nghe chép, luyện nói, từ TOPIK và tiến độ vào một không gian học mềm mại, dễ bắt đầu.
+                            HanLingua gom luyện nghe chép Dictation, AI phân tích lỗi sai, luyện nói và Forecast TOPIK vào một lộ trình học tiếng Hàn dễ bắt đầu.
                         </p>
                         <div class="flex flex-col sm:flex-row gap-3">
                             <button id="landing-register-cta" onclick="AuthUI.openModal(false)" class="bg-hanred-600 hover:bg-hanred-700 text-white px-7 py-3.5 rounded-lg font-black text-base shadow-lg flex justify-center items-center cursor-pointer">
@@ -1573,7 +1630,7 @@
     <script src="js/account-ui.js?v=20260601-04"></script>
     <script src="js/admin-ui.js?v=20260615-04"></script>
     <script src="js/vocabulary-ui.js?v=20260601-04"></script>
-    <script src="js/main.js?v=20260615-03"></script>
+    <script src="js/main.js?v=20260615-04"></script>
 
     <script>
         window.onload = () => { 
