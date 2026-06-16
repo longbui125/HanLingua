@@ -70,6 +70,27 @@ const SEO_PAGES = {
         description: 'Luyện nghe chép tiếng Hàn qua dictation: nghe audio thực tế, gõ lại nội dung, đối chiếu transcript và nhận phân tích lỗi sai.',
         keywords: 'nghe chép tiếng Hàn, luyện nghe tiếng Hàn qua dictation, chép chính tả tiếng Hàn có chấm điểm, luyện nghe tiếng Hàn audio thực tế'
     },
+    '/dictation-ai-ca-nhan': {
+        ...SEO_DEFAULT,
+        path: '/dictation-ai-ca-nhan',
+        title: 'Dictation AI cá nhân cho tiếng Hàn - HanLingua',
+        description: 'Dictation AI cá nhân giúp bạn luyện nghe tiếng Hàn bằng audio của mình, chép lại nội dung nghe được, so với transcript và xem lỗi sai rõ ràng.',
+        keywords: 'dictation AI cá nhân, dictation tiếng Hàn bằng AI, luyện dictation tiếng Hàn với tài liệu cá nhân, chép chính tả tiếng Hàn bằng audio riêng'
+    },
+    '/nghe-chep-chinh-ta-audio-tu-upload': {
+        ...SEO_DEFAULT,
+        path: '/nghe-chep-chinh-ta-audio-tu-upload',
+        title: 'Nghe chép chính tả với audio tự upload - HanLingua',
+        description: 'Luyện nghe chép chính tả tiếng Hàn với audio tự upload: tải file nghe lên, chép lại nội dung, so sánh với transcript và cải thiện kỹ năng nghe.',
+        keywords: 'nghe chép chính tả với audio tự upload, luyện nghe tiếng Hàn bằng file audio, chép chính tả tiếng Hàn từ audio cá nhân'
+    },
+    '/luyen-nghe-tai-lieu-ca-nhan': {
+        ...SEO_DEFAULT,
+        path: '/luyen-nghe-tai-lieu-ca-nhan',
+        title: 'Luyện nghe tiếng Hàn với tài liệu cá nhân - HanLingua',
+        description: 'Luyện nghe tiếng Hàn với tài liệu cá nhân, audio riêng hoặc bài học tự chọn bằng phương pháp nghe chép chính tả và AI hỗ trợ kiểm tra.',
+        keywords: 'luyện nghe tiếng Hàn với tài liệu cá nhân, nghe chép chính tả tài liệu cá nhân, học tiếng Hàn bằng audio riêng'
+    },
     '/luyen-nghe-tieng-han': {
         ...SEO_DEFAULT,
         path: '/luyen-nghe-tieng-han',
@@ -237,7 +258,7 @@ function routeForPath(path = window.location.pathname) {
     if (['/hoc-tieng-han', '/he-sinh-thai-hoc-tieng-han'].includes(routePath)) {
         return { viewId: 'view-landing', sectionId: 'about' };
     }
-    if (['/nghe-chep-tieng-han', '/luyen-nghe-tieng-han'].includes(routePath)) {
+    if (['/nghe-chep-tieng-han', '/luyen-nghe-tieng-han', '/dictation-ai-ca-nhan', '/nghe-chep-chinh-ta-audio-tu-upload', '/luyen-nghe-tai-lieu-ca-nhan'].includes(routePath)) {
         return { viewId: 'view-landing', sectionId: 'features' };
     }
     if (routePath === '/luyen-noi-tieng-han-ai') {
