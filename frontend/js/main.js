@@ -161,7 +161,10 @@ function updateStructuredData(seo) {
             name: 'HanLingua',
             url: SEO_SITE_URL,
             logo: `${SEO_SITE_URL}/assets/img_10.png`,
-            description: SEO_DEFAULT.description
+            description: SEO_DEFAULT.description,
+            sameAs: [
+                'https://www.facebook.com/hanlingua'
+            ]
         },
         {
             '@type': 'WebSite',
