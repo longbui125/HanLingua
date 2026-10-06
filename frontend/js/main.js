@@ -502,7 +502,7 @@ const AuthUI = {
                                     <button onclick="switchMorePanel('about')" id="more-tab-about" class="more-tab bg-gray-100 text-gray-600 rounded-md px-3 py-2">Giới thiệu</button>
                                 </div>
                                 <div id="more-panel-account" class="more-panel"><div class="text-xs font-black text-gray-400 uppercase mb-3">Thông tin người dùng</div><div id="more-user-info" class="space-y-3 text-sm text-gray-600"><p>Vui lòng đăng nhập để xem thông tin tài khoản.</p></div></div>
-                                <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div><p>Chọn gói học và thanh toán bằng QR Vietcombank. Sau khi chuyển khoản, admin xác minh và mở quyền học.</p><button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' }); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button></div>
+                                <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div><p>Chọn gói học để xem thông tin. Tài khoản ABC hiện là dữ liệu minh họa và chưa nhận thanh toán.</p><button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' }); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button></div>
                                 <div id="more-panel-features" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Tính năng</div><p><b>AI Dictation:</b> nghe chép, chấm điểm, hiện lỗi sai và đáp án.</p><p><b>AI Speaking:</b> luyện nói theo ngữ cảnh, tăng phản xạ giao tiếp.</p><p><b>Forecast Vocabulary:</b> học thẻ từ TOPIK theo chủ đề, có nghĩa và ví dụ.</p><p><b>Dashboard:</b> streak, lộ trình ngày, accuracy, activity log.</p></div>
                                 <div id="more-panel-about" class="more-panel hidden text-sm text-gray-600 space-y-3"><div class="text-xs font-black text-gray-400 uppercase">Giới thiệu</div><p>HanLingua là nền tảng học tiếng Hàn tập trung vào Dictation, Speaking và từ vựng TOPIK theo chủ đề.</p><p>Nền tảng có lộ trình học rõ ràng, dashboard tiến độ, AI Dictation, AI Speaking và Forecast Vocabulary.</p></div>
                             </div>
@@ -2657,15 +2657,9 @@ function openPaymentModal(planName, amount) {
     const username = currentUser ? currentUser.username : 'khach';
     const note = `HANLINGUA ${username} ${planName}`.toUpperCase();
     currentPayment = { plan_name: planName, amount, note };
-    const qrUrl = new URL('https://img.vietqr.io/image/VCB-1026858087-compact2.png');
-    qrUrl.searchParams.set('amount', amount);
-    qrUrl.searchParams.set('addInfo', note);
-    qrUrl.searchParams.set('accountName', 'GIAP VAN KHANH');
-
     document.getElementById('payment-plan').innerText = planName;
     document.getElementById('payment-amount').innerText = formattedAmount;
     document.getElementById('payment-note').innerText = note;
-    document.getElementById('payment-qr').src = qrUrl.toString();
     modal.classList.remove('hidden');
 }
 

@@ -117,7 +117,7 @@
                                 </div>
                                 <div id="more-panel-payment" class="more-panel hidden text-sm text-gray-600 space-y-3">
                                     <div class="text-xs font-black text-gray-400 uppercase">Thanh toán</div>
-                                    <p>Chọn gói học và thanh toán bằng QR Vietcombank. Sau khi chuyển khoản, admin xác minh và mở quyền học.</p>
+                                    <p>Chọn gói học để xem thông tin. Tài khoản ABC hiện là dữ liệu minh họa và chưa nhận thanh toán.</p>
                                     <button onclick="switchView('view-profile', { userPanelId: 'user-payment-section' }); toggleMoreMenu();" class="w-full bg-hanred-600 hover:bg-hanred-700 text-white px-4 py-3 rounded-xl font-bold">Mở gói học</button>
                                 </div>
                                 <div id="more-panel-features" class="more-panel hidden text-sm text-gray-600 space-y-3">
@@ -1543,18 +1543,15 @@
                     </div>
                     <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
                 </div>
-                <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-5">
-                    <img id="payment-qr" src="" alt="QR thanh toán Vietcombank" class="w-full max-w-xs mx-auto rounded-xl bg-white">
-                </div>
                 <div class="text-left bg-red-50 rounded-xl p-4 text-sm text-gray-700 space-y-1">
-                    <p><b>Ngân hàng:</b> Vietcombank</p>
-                    <p><b>Số tài khoản:</b> 1026858087</p>
-                    <p><b>Chủ tài khoản:</b> GIAP VAN KHANH</p>
+                    <p><b>Ngân hàng:</b> ABC (minh họa)</p>
+                    <p><b>Số tài khoản:</b> ABC000000001</p>
+                    <p><b>Chủ tài khoản:</b> ABC</p>
                     <p><b>Số tiền:</b> <span id="payment-amount" class="font-bold text-hanred-600"></span></p>
                     <p><b>Nội dung:</b> <span id="payment-note"></span></p>
                 </div>
-                <button onclick="notifyPaymentDone()" class="w-full mt-5 bg-hanred-600 hover:bg-hanred-700 text-white font-bold py-3 rounded-xl transition shadow-md cursor-pointer">Tôi đã chuyển khoản</button>
-                <p class="text-xs text-gray-400 mt-4">Sau khi chuyển khoản, admin sẽ kiểm tra và gia hạn tài khoản cho bạn.</p>
+                <button type="button" disabled class="w-full mt-5 bg-gray-200 text-gray-500 font-bold py-3 rounded-xl cursor-not-allowed">Thanh toán chưa được cấu hình</button>
+                <p class="text-xs text-gray-400 mt-4">Đây là tài khoản ảo dùng để minh họa, không dùng để chuyển khoản.</p>
             </div>
         </div>
     </div>
